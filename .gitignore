@@ -1,0 +1,30 @@
+# Secrets
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Models, data, indexes (too big for git; keep on HF Hub / Drive)
+*.safetensors
+*.bin
+*.gguf
+*.pt
+*.zip
+models/
+qdrant_db/
+*.db
+data/private/
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
