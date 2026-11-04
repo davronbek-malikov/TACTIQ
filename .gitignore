@@ -28,3 +28,11 @@ data/private/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# TACTIQ data folders: keep the structure, not the contents
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+qdrant_local/
+.pytest_cache/

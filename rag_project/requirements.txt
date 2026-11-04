@@ -1,8 +1,0 @@
-# Indexing pipeline (Lesson 5). Tested with Python 3.11 on Windows CPU.
-sentence-transformers==6.2.0
-transformers==5.22.1
-torch>=2.5
-qdrant-client==1.20.0
-pypdf==6.21.4
-python-docx==1.2.0
-python-dotenv>=0.21

@@ -1,0 +1,40 @@
+EDUCATIONAL SAMPLE MATERIAL.   Written for testing the TACTIQ indexing pipeline.
+It describes general tactical concepts only.    It contains no real match data,
+no statistics and no observations about real teams or players.
+
+
+
+LOW BLOCK
+
+
+What a low block is
+A low block is a defensive organisation in which a team defends close to its own goal,
+usually with its last line near the edge of its own penalty area.    The team gives up
+territory in exchange for compact spaces:   the opponent has the ball, but little room
+between and behind the defensive lines.
+
+
+
+Typical shape
+Common low-block shapes are 4-4-2, 4-5-1 and 5-4-1.    The distances between the lines
+are kept short so that a pass into the space between the lines can be pressed at once.
+Wide players often help their full-backs, creating two-versus-one situations near the
+touchline.
+
+
+Strengths
+- Little space behind the defence, so runs in behind are less dangerous.
+- The central area in front of goal is crowded.
+- After winning the ball, there may be large spaces for a counter-attack.
+
+
+Weaknesses
+- The opponent can keep possession for long periods.
+- Crosses, second balls and shots from outside the box become important risks.
+- Counter-attacks start far from the opponent's goal.
+
+
+Analysis note
+Event data can show where the opponent's shots and crosses came from.    To judge how
+compact the block actually was, line distances and player positions are needed,
+which normally requires tracking data or video.

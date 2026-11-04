@@ -1,0 +1,19 @@
+# TACTIQ — indexing pipeline dependencies (tested with Python 3.11 on Windows, CPU).
+# Only what the current implementation uses. Future modules add their own dependencies.
+
+# Document loading
+pymupdf==2.1
+python-docx==1.2.0
+
+# Tokenizer + embeddings (installs torch as a dependency)
+sentence-transformers==6.2.0
+transformers==5.22.1
+
+# Vector database client
+qdrant-client==1.20.0
+
+# Configuration
+python-dotenv>=0.21
+
+# Testing
+pytest>=7.4

@@ -1,0 +1,22 @@
+# TACTIQ local development services.
+# Start:  docker compose up -d qdrant
+# Stop:   docker compose down          (data is kept in the named volume)
+# Reset:  docker compose down -v       (deletes the stored vectors)
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.20.0
+    container_name: tactiq-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"   # REST API + web dashboard: http://localhost:6333/dashboard
+      - "6334:6334"   # gRPC API
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      # Local development only: no API key. For any shared or cloud deployment,
+      # set QDRANT__SERVICE__API_KEY here and QDRANT_API_KEY in .env.
+      QDRANT__LOG_LEVEL: INFO
+
+volumes:
+  qdrant_storage:
