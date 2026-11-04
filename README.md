@@ -272,6 +272,7 @@ own store, and the chunk payload already has optional `match_id`, `team_id` and 
 
 ## 9. The indexing pipeline (implemented)
 
+Code: [`indexing_pipeline/`](indexing_pipeline/) (see its [README](indexing_pipeline/README.md)).
 The indexing pipeline runs **before** any user asks a question. It turns tactical documents into
 searchable vectors in Qdrant.
 
@@ -287,12 +288,12 @@ flowchart LR
 
 | Step | Module | What it does |
 |---|---|---|
-| 1. Document Loading | `indexing/document_loading/` | Recursively discovers files; extracts text from PDF (one `Document` per page, page number kept), DOCX (paragraphs and tables), TXT and Markdown. Unsupported files are counted and skipped; corrupted files are recorded as failures without stopping the run. |
-| 2. Text Cleaning | `indexing/text_cleaning/` | Unicode NFC normalisation, removal of control characters, collapsing repeated spaces and blank lines. Punctuation, case, numbers and terms such as `4-3-3` or `xG` are preserved. Each step can be switched off with `CleaningConfig`. |
-| 3. Metadata | `indexing/metadata/` | Stable `document_id` (UUID5 of the relative path), source name and path, file type, page. Optional `document_type`, `topic`, `language`, `match_id`, `team_id`, `player_id` come **only** from a human-written sidecar file `<file>.meta.json`; otherwise they stay `None`. Nothing is guessed. |
-| 4. Chunking | `indexing/chunking/` | Token-based fixed-size windows using the embedding model's own tokenizer (default 500 tokens, 50 overlap). Chunk text is sliced from the original text via token offsets, so case and spacing are preserved. Each chunk gets a stable `chunk_id`. |
-| 5. Embedding Generation | `indexing/embeddings/` | Loads the Sentence Transformers model once, embeds in batches, L2-normalises vectors (so cosine similarity equals the dot product), reads the vector dimension from real model output and validates shape and finite values. |
-| 6. Qdrant Storage | `indexing/vector_store/` | Creates the collection with the actual dimension and cosine distance, adds payload indexes, deletes a document's old chunks and upserts the new ones in batches. Re-ingesting the same files never creates duplicates. |
+| 1. Document Loading | `indexing_pipeline/src/indexing/document_loading/` | Recursively discovers files; extracts text from PDF (one `Document` per page, page number kept), DOCX (paragraphs and tables), TXT and Markdown. Unsupported files are counted and skipped; corrupted files are recorded as failures without stopping the run. |
+| 2. Text Cleaning | `indexing_pipeline/src/indexing/text_cleaning/` | Unicode NFC normalisation, removal of control characters, collapsing repeated spaces and blank lines. Punctuation, case, numbers and terms such as `4-3-3` or `xG` are preserved. Each step can be switched off with `CleaningConfig`. |
+| 3. Metadata | `indexing_pipeline/src/indexing/metadata/` | Stable `document_id` (UUID5 of the relative path), source name and path, file type, page. Optional `document_type`, `topic`, `language`, `match_id`, `team_id`, `player_id` come **only** from a human-written sidecar file `<file>.meta.json`; otherwise they stay `None`. Nothing is guessed. |
+| 4. Chunking | `indexing_pipeline/src/indexing/chunking/` | Token-based fixed-size windows using the embedding model's own tokenizer (default 500 tokens, 50 overlap). Chunk text is sliced from the original text via token offsets, so case and spacing are preserved. Each chunk gets a stable `chunk_id`. |
+| 5. Embedding Generation | `indexing_pipeline/src/indexing/embeddings/` | Loads the Sentence Transformers model once, embeds in batches, L2-normalises vectors (so cosine similarity equals the dot product), reads the vector dimension from real model output and validates shape and finite values. |
+| 6. Qdrant Storage | `indexing_pipeline/src/indexing/vector_store/` | Creates the collection with the actual dimension and cosine distance, adds payload indexes, deletes a document's old chunks and upserts the new ones in batches. Re-ingesting the same files never creates duplicates. |
 
 **Chunk payload stored in Qdrant**
 
@@ -366,27 +367,28 @@ TACTIQ/
 │   ├── processed/             # chunks.jsonl written by the pipeline for inspection (git-ignored)
 │   └── sample_docs/           # educational sample documents + .meta.json sidecars
 │
-├── src/tactiq/
-│   └── indexing/
-│       ├── document_loading/  # document.py (Document), loader.py
-│       ├── text_cleaning/     # cleaner.py
-│       ├── metadata/          # metadata_builder.py
-│       ├── chunking/          # text_splitter.py
-│       ├── embeddings/        # embedding_model.py
-│       ├── vector_store/      # qdrant_store.py
-│       └── pipeline.py        # connects the six steps
+├── indexing_pipeline/           # first pipeline — implemented (own README in Uzbek)
+│   ├── src/indexing/
+│   │   ├── document_loading/      # document.py (Document), loader.py
+│   │   ├── text_cleaning/         # cleaner.py
+│   │   ├── metadata/              # metadata_builder.py
+│   │   ├── chunking/              # text_splitter.py
+│   │   ├── embeddings/            # embedding_model.py
+│   │   ├── vector_store/          # qdrant_store.py
+│   │   └── pipeline.py            # connects the six steps
+│   ├── scripts/                   # ingest_documents.py, inspect_collection.py
+│   ├── notebooks/                 # indexing_pipeline.ipynb — step-by-step walkthrough
+│   └── tests/                     # pytest unit + integration tests
 │
-├── scripts/
-│   ├── ingest_documents.py    # CLI: run the full pipeline
-│   └── inspect_collection.py  # CLI: show collection size and sample payloads
-│
-├── notebooks/
-│   └── indexing_pipeline.ipynb  # step-by-step walkthrough
-│
-├── tests/                     # pytest unit + integration tests
+├── retrieval_generation_pipeline/ # second pipeline — planned, same layout
 │
 └── Extra/                     # material kept for later use, not part of the TACTIQ package
 ```
+
+Each pipeline is a self-contained folder (`src/`, `scripts/`, `notebooks/`, `tests/`, `README.md`),
+so it can be studied on its own. Shared pieces stay at the root: `config/`, `data/`, `.env`,
+`docker-compose.yml`. The retrieval pipeline will import `EmbeddingModel` and `QdrantStore` from
+`indexing` rather than copying them, so documents and questions are always embedded with the same model.
 
 Code comments and docstrings are written in Uzbek (Latin script) for educational use; technical
 terms, identifiers and library names stay in English.
@@ -438,13 +440,13 @@ Without Docker, set `QDRANT_LOCAL_PATH=qdrant_local` in `.env` to use Qdrant's e
 
 ```bash
 # the bundled educational samples
-python scripts/ingest_documents.py --data-dir data/sample_docs
+python indexing_pipeline/scripts/ingest_documents.py --data-dir data/sample_docs
 
 # your own documents in data/raw/
-python scripts/ingest_documents.py
+python indexing_pipeline/scripts/ingest_documents.py
 
 # check what was stored
-python scripts/inspect_collection.py --limit 3
+python indexing_pipeline/scripts/inspect_collection.py --limit 3
 ```
 
 To attach optional metadata to a document, create a sidecar next to it, for example
