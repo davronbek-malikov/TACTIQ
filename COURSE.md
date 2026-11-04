@@ -6,7 +6,7 @@
 ## Who and what
 
 - **Teacher:** Davronbek Malikov (git user `Davronbek`). Teaches an LLM course to Uzbek students.
-- **This repo:** `davronbek-malikov/RAG` (GitHub, public). Local path `C:\Users\davro\OneDrive\Desktop\RAG`.
+- **This repo:** `davronbek-malikov/TACTIQ` (GitHub, public; renamed from `RAG` on 2026-11-04). Local path `C:\Users\davro\OneDrive\Desktop\RAG`.
 - **This phase:** Month 4 of the course = **"1-oy"** of the LLM Engineering + RAG phase (12 lessons).
   Month 5 (= "2-oy": Agents + Production + Career) comes after it.
 - **We build each lesson together:** one lesson per working session. Claude prepares materials, Davronbek reviews,
@@ -68,3 +68,4 @@ Full summary: `C:\Users\davro\OneDrive\Desktop\Post-Training\POST_TRAINING_LESSO
 | Date | Decision |
 |---|---|
 | 2026-10-24 | Repo created at `Desktop/RAG` as its own git repo (remote `davronbek-malikov/RAG`); roadmap copied to `1-oy/ROADMAP.md`. |
+| 2026-11-04 | Repo renamed `RAG` → `TACTIQ`. Worked project lives in `rag_project/` (indexing_pipeline + retrieval_generation_pipeline), domain = fictitious OASIS company, embedder Qwen3-Embedding-0.6B, Qdrant local mode by default. |
