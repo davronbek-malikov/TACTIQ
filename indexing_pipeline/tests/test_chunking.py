@@ -2,9 +2,9 @@
 
 import pytest
 
-from indexing.chunking import TokenTextSplitter, make_chunk_id, make_token_windows
-from indexing.document_loading import Document
-from indexing.metadata import make_document_id
+from indexing.step4_chunking import TokenTextSplitter, make_chunk_id, make_token_windows
+from indexing.step1_document_loading import Document
+from indexing.step2_metadata import make_document_id
 
 # ---------- pure window maths (no tokenizer needed) ----------
 

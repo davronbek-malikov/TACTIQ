@@ -4,7 +4,7 @@ import pymupdf
 import pytest
 from docx import Document as DocxFile
 
-from indexing.document_loading import discover_files, load_directory, load_file
+from indexing.step1_document_loading import discover_files, load_directory, load_file
 
 
 def make_pdf(path, page_texts):

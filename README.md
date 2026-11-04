@@ -157,7 +157,7 @@ flowchart TD
 
     subgraph ING["G. Data ingestion and processing"]
         DOCS["Tactical documents<br/>PDF, DOCX, TXT, MD"]
-        IDX["Document indexing pipeline<br/>load, clean, metadata,<br/>chunk, embed, store"]
+        IDX["Document indexing pipeline<br/>load, metadata, clean,<br/>chunk, embed, store"]
         DATA["Football match / event data"]
         SDI["Structured data ingestion"]
         VID["Video sources (V2)"]
@@ -279,8 +279,8 @@ searchable vectors in Qdrant.
 ```mermaid
 flowchart LR
     A["data/raw/<br/>PDF, DOCX, TXT, MD"] --> B["1. Document Loading"]
-    B --> C["2. Text Cleaning"]
-    C --> D["3. Metadata"]
+    B --> C["2. Metadata"]
+    C --> D["3. Text Cleaning"]
     D --> E["4. Chunking<br/>500 / 50 tokens"]
     E --> F["5. Embedding Generation<br/>all-MiniLM-L6-v2, 384-dim"]
     F --> G[("6. Qdrant<br/>vector + payload")]
@@ -288,12 +288,12 @@ flowchart LR
 
 | Step | Module | What it does |
 |---|---|---|
-| 1. Document Loading | `indexing_pipeline/src/indexing/document_loading/` | Recursively discovers files; extracts text from PDF (one `Document` per page, page number kept), DOCX (paragraphs and tables), TXT and Markdown. Unsupported files are counted and skipped; corrupted files are recorded as failures without stopping the run. |
-| 2. Text Cleaning | `indexing_pipeline/src/indexing/text_cleaning/` | Unicode NFC normalisation, removal of control characters, collapsing repeated spaces and blank lines. Punctuation, case, numbers and terms such as `4-3-3` or `xG` are preserved. Each step can be switched off with `CleaningConfig`. |
-| 3. Metadata | `indexing_pipeline/src/indexing/metadata/` | Stable `document_id` (UUID5 of the relative path), source name and path, file type, page. Optional `document_type`, `topic`, `language`, `match_id`, `team_id`, `player_id` come **only** from a human-written sidecar file `<file>.meta.json`; otherwise they stay `None`. Nothing is guessed. |
-| 4. Chunking | `indexing_pipeline/src/indexing/chunking/` | Token-based fixed-size windows using the embedding model's own tokenizer (default 500 tokens, 50 overlap). Chunk text is sliced from the original text via token offsets, so case and spacing are preserved. Each chunk gets a stable `chunk_id`. |
-| 5. Embedding Generation | `indexing_pipeline/src/indexing/embeddings/` | Loads the Sentence Transformers model once, embeds in batches, L2-normalises vectors (so cosine similarity equals the dot product), reads the vector dimension from real model output and validates shape and finite values. |
-| 6. Qdrant Storage | `indexing_pipeline/src/indexing/vector_store/` | Creates the collection with the actual dimension and cosine distance, adds payload indexes, deletes a document's old chunks and upserts the new ones in batches. Re-ingesting the same files never creates duplicates. |
+| 1. Document Loading | `indexing_pipeline/src/indexing/step1_document_loading/` | Recursively discovers files; extracts text from PDF (one `Document` per page, page number kept), DOCX (paragraphs and tables), TXT and Markdown. Unsupported files are counted and skipped; corrupted files are recorded as failures without stopping the run. |
+| 2. Metadata | `indexing_pipeline/src/indexing/step2_metadata/` | Stable `document_id` (UUID5 of the relative path), source name and path, file type, page. Optional `document_type`, `topic`, `language`, `match_id`, `team_id`, `player_id` come **only** from a human-written sidecar file `<file>.meta.json`; otherwise they stay `None`. Nothing is guessed. |
+| 3. Text Cleaning | `indexing_pipeline/src/indexing/step3_text_cleaning/` | Unicode NFC normalisation, removal of control characters, collapsing repeated spaces and blank lines. Punctuation, case, numbers and terms such as `4-3-3` or `xG` are preserved. Each step can be switched off with `CleaningConfig`. |
+| 4. Chunking | `indexing_pipeline/src/indexing/step4_chunking/` | Token-based fixed-size windows using the embedding model's own tokenizer (default 500 tokens, 50 overlap). Chunk text is sliced from the original text via token offsets, so case and spacing are preserved. Each chunk gets a stable `chunk_id`. |
+| 5. Embedding Generation | `indexing_pipeline/src/indexing/step5_embeddings/` | Loads the Sentence Transformers model once, embeds in batches, L2-normalises vectors (so cosine similarity equals the dot product), reads the vector dimension from real model output and validates shape and finite values. |
+| 6. Qdrant Storage | `indexing_pipeline/src/indexing/step6_vector_store/` | Creates the collection with the actual dimension and cosine distance, adds payload indexes, deletes a document's old chunks and upserts the new ones in batches. Re-ingesting the same files never creates duplicates. |
 
 **Chunk payload stored in Qdrant**
 
@@ -369,12 +369,12 @@ TACTIQ/
 │
 ├── indexing_pipeline/           # first pipeline — implemented (own README in Uzbek)
 │   ├── src/indexing/
-│   │   ├── document_loading/      # document.py (Document), loader.py
-│   │   ├── text_cleaning/         # cleaner.py
-│   │   ├── metadata/              # metadata_builder.py
-│   │   ├── chunking/              # text_splitter.py
-│   │   ├── embeddings/            # embedding_model.py
-│   │   ├── vector_store/          # qdrant_store.py
+│   │   ├── step1_document_loading/      # document.py (Document), loader.py
+│   │   ├── step2_metadata/              # metadata_builder.py
+│   │   ├── step3_text_cleaning/         # cleaner.py
+│   │   ├── step4_chunking/              # text_splitter.py
+│   │   ├── step5_embeddings/            # embedding_model.py
+│   │   ├── step6_vector_store/          # qdrant_store.py
 │   │   └── pipeline.py            # connects the six steps
 │   ├── scripts/                   # ingest_documents.py, inspect_collection.py
 │   ├── notebooks/                 # indexing_pipeline.ipynb — step-by-step walkthrough
@@ -477,7 +477,7 @@ sample documents.
 
 | Module | Status |
 |---|---|
-| Document indexing pipeline (load → clean → metadata → chunk → embed → Qdrant) | ✅ Implemented and tested |
+| Document indexing pipeline (load → metadata → clean → chunk → embed → Qdrant) | ✅ Implemented and tested |
 | Retrieval (semantic, keyword / BM25, hybrid, RRF, reranking) | Not implemented |
 | LLM Engine and grounded generation | Not implemented |
 | Football Analytics Engine (PostgreSQL, SQL, Pandas) | Not implemented |

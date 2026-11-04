@@ -20,6 +20,6 @@ def tokenizer():
 
 @pytest.fixture(scope="session")
 def embedding_model():
-    from indexing.embeddings import EmbeddingModel
+    from indexing.step5_embeddings import EmbeddingModel
 
     return EmbeddingModel(MODEL_NAME, batch_size=4)

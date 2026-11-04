@@ -1,7 +1,7 @@
 """Tests for Text Cleaning."""
 
-from indexing.document_loading import Document
-from indexing.text_cleaning import CleaningConfig, clean_document, clean_text
+from indexing.step1_document_loading import Document
+from indexing.step3_text_cleaning import CleaningConfig, clean_document, clean_text
 
 
 def test_collapses_spaces_and_trims_lines():
@@ -24,7 +24,7 @@ def test_preserves_football_terms_punctuation_and_names():
 
 
 def test_replaces_non_breaking_spaces_and_normalises_unicode():
-    decomposed = "Gündoğan pressing"  # "ü" and "ğ" written as letter + accent
+    decomposed = "Gu\u0308ndog\u0306an\u00a0pressing"  # "ü" and "ğ" written as letter + accent
     assert clean_text(decomposed) == "Gündoğan pressing"
 
 

@@ -2,11 +2,11 @@
 
 import json
 
-from indexing.chunking import Chunk
-from indexing.document_loading import Document, load_file
-from indexing.metadata import OPTIONAL_FIELDS, attach_metadata, build_metadata, make_document_id
-from indexing.text_cleaning import clean_document
-from indexing.vector_store import build_payload
+from indexing.step4_chunking import Chunk
+from indexing.step1_document_loading import Document, load_file
+from indexing.step2_metadata import OPTIONAL_FIELDS, attach_metadata, build_metadata, make_document_id
+from indexing.step3_text_cleaning import clean_document
+from indexing.step6_vector_store import build_payload
 
 EXPECTED_KEYS = {
     "document_id", "source", "source_path", "file_type", "page",
@@ -50,7 +50,7 @@ def test_sidecar_metadata_is_used_and_unknown_keys_ignored(tmp_path):
 
 
 def test_metadata_survives_cleaning_and_payload(tmp_path):
-    document = attach_metadata(clean_document(loaded_document(tmp_path, text="  High   press  ")), tmp_path)
+    document = clean_document(attach_metadata(loaded_document(tmp_path, text="  High   press  "), tmp_path))
     chunk = Chunk(chunk_id="c1", document_id=document.metadata["document_id"], text=document.text,
                   metadata={**document.metadata, "chunk_index": 0, "token_count": 2})
 

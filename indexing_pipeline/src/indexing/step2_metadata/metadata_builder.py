@@ -1,5 +1,5 @@
 """
-Metadata — 3-bosqich
+Metadata — 2-bosqich
 
 Metadata — "matn haqidagi ma'lumot": u qaysi fayldan, qaysi sahifadan kelgani,
 qanday hujjat turi, qaysi mavzu, qaysi til va (bo'lsa) qaysi o'yin / jamoa / o'yinchiga tegishli.
@@ -17,18 +17,18 @@ Qoidamiz: metadata'ni O'YLAB TOPMAYMIZ.
 
 Bu modul Text Cleaning'dan ALOHIDA: tozalash matnni o'zgartiradi, metadata esa matnga tegmaydi.
 
-Input:  tozalangan Document
+Input:  Document Loading bergan Document
 Output: to'liq metadata'ga ega Document
 
-Keyingi bosqich: Chunking.
+Keyingi bosqich: Text Cleaning.
 """
 
-import json
-import uuid
-from pathlib import Path
-from typing import Optional
+import json  # json — JSON formatdagi matnni Python dict'ga (va aksincha) aylantiruvchi standart kutubxona
+import uuid  # uuid — noyob identifikator (UUID) yaratuvchi standart kutubxona
+from pathlib import Path  # Path — fayl yo'llari bilan ishlash
+from typing import Optional  # Optional[X] — "X yoki None" degan type hint
 
-from indexing.document_loading import Document
+from indexing.step1_document_loading import Document  # 1-bosqichdagi Document dataclass
 
 # UUID (Universally Unique Identifier) — 128-bitli noyob identifikator,
 # masalan "3f2b8c1e-5d7a-5e2b-9c4d-1a2b3c4d5e6f".
@@ -38,7 +38,7 @@ from indexing.document_loading import Document
 # shuning uchun Qdrant'da dublikatlar paydo bo'lmaydi.
 # Bu namespace — TACTIQ uchun bir marta tanlangan doimiy qiymat. Uni o'zgartirmang:
 # o'zgarsa, barcha ID'lar o'zgaradi va eski ma'lumotlar dublikatga aylanadi.
-TACTIQ_NAMESPACE = uuid.UUID("8c6b1f0e-2d4a-4b7e-9f3c-5a1d2e3f4b6c")
+TACTIQ_NAMESPACE = uuid.UUID("8c6b1f0e-2d4a-4b7e-9f3c-5a1d2e3f4b6c")  # KATTA_HARF nom — "o'zgarmas qiymat (constant)" kelishuvi
 
 # Sidecar faylda yozish mumkin bo'lgan maydonlar. Boshqa kalitlar e'tiborga olinmaydi.
 OPTIONAL_FIELDS = ["document_type", "topic", "language", "match_id", "team_id", "player_id"]
@@ -52,6 +52,8 @@ def make_document_id(source_path: str) -> str:
 
     Eslatma: PDF'ning barcha sahifalari bitta document_id'ga ega (ular bitta hujjat).
     """
+    # "document:" prefiksi — chunk ID'lari bilan hech qachon to'qnashmasligi uchun.
+    # str(...) — UUID obyektini oddiy matnga aylantiramiz (JSON va Qdrant uchun qulay).
     return str(uuid.uuid5(TACTIQ_NAMESPACE, f"document:{source_path}"))
 
 
@@ -61,13 +63,17 @@ def read_sidecar_metadata(file_path: Path) -> dict:
     Input:  hujjat faylining to'liq yo'li.
     Output: faqat OPTIONAL_FIELDS'dagi kalitlardan iborat dict. Sidecar bo'lmasa — {}.
     """
+    # .with_name(...) — xuddi shu papkada, boshqa nomli fayl yo'li: high_pressing.pdf -> high_pressing.pdf.meta.json
     sidecar_path = file_path.with_name(file_path.name + ".meta.json")
-    if not sidecar_path.exists():
-        return {}
+    if not sidecar_path.exists():  # .exists() — fayl diskda bormi?
+        return {}  # sidecar yo'q — bo'sh dict, hech narsa taxmin qilmaymiz
 
+    # with — context manager: blok tugaganda fayl avtomatik yopiladi.
     with sidecar_path.open(encoding="utf-8") as file:
-        data = json.load(file)
+        data = json.load(file)  # json.load() — fayldagi JSON matnni Python dict'ga aylantiradi
 
+    # Dict comprehension — list comprehension'ning dict varianti: {kalit: qiymat for ... if ...}
+    # Faqat ruxsat etilgan kalitlarni olamiz; sidecar'dagi boshqa "keraksiz" kalitlar tashlab yuboriladi.
     return {key: data[key] for key in OPTIONAL_FIELDS if key in data}
 
 
@@ -81,27 +87,30 @@ def build_metadata(document: Document, data_dir: Optional[Path] = None) -> dict:
         {"document_id", "source", "source_path", "file_type", "page",
          "document_type", "topic", "language", "match_id", "team_id", "player_id"}
     """
-    source_path = document.metadata["source_path"]
+    source_path = document.metadata["source_path"]  # dict["kalit"] — qiymatni olish (kalit bo'lmasa — KeyError)
 
     metadata = {
         "document_id": make_document_id(source_path),
         "source": document.metadata["source"],
         "source_path": source_path,
         "file_type": document.metadata["file_type"],
-        "page": document.metadata.get("page"),
+        "page": document.metadata.get("page"),  # .get("kalit") — kalit bo'lmasa xato emas, None qaytaradi
     }
 
     # Noma'lum maydonlar uchun default: None (to'qib chiqarilgan qiymat emas).
     for key in OPTIONAL_FIELDS:
         metadata[key] = None
 
-    if data_dir is not None:
-        sidecar = read_sidecar_metadata(Path(data_dir) / source_path)
-        metadata.update(sidecar)
+    if data_dir is not None:  # "is not None" — None bilan solishtirishning to'g'ri usuli
+        sidecar = read_sidecar_metadata(Path(data_dir) / source_path)  # Path / "a/b.pdf" — yo'llarni "/" bilan qo'shish
+        metadata.update(sidecar)  # .update() — sidecar'dagi qiymatlar None'larning ustiga yoziladi
 
     return metadata
 
 
 def attach_metadata(document: Document, data_dir: Optional[Path] = None) -> Document:
-    """Matnni o'zgartirmasdan, Document'ga to'liq metadata biriktiradi."""
+    """Matnni o'zgartirmasdan, Document'ga to'liq metadata biriktiradi.
+
+    Asl Document o'zgarmaydi — YANGI Document qaytariladi (xavfsizroq: hech kim kutmagan joyda ma'lumot o'zgarmaydi).
+    """
     return Document(text=document.text, metadata=build_metadata(document, data_dir))

@@ -4,7 +4,7 @@ TACTIQ'ning birinchi pipeline'i. U foydalanuvchi savol berishidan **oldin** ishl
 futbol hujjatlarini Qdrant'da qidirish mumkin bo'lgan vector'larga aylantiradi.
 
 ```
-Document Loading -> Text Cleaning -> Metadata -> Chunking -> Embedding Generation -> Qdrant Storage
+Document Loading -> Metadata -> Text Cleaning -> Chunking -> Embedding Generation -> Qdrant Storage
 ```
 
 ## Papka tuzilishi
@@ -13,18 +13,18 @@ Document Loading -> Text Cleaning -> Metadata -> Chunking -> Embedding Generatio
 indexing_pipeline/
 ├── README.md                        # shu fayl
 ├── src/indexing/
-│   ├── document_loading/
+│   ├── step1_document_loading/
 │   │   ├── document.py              # Document dataclass — barcha bosqichlar shu obyektni uzatadi
 │   │   └── loader.py                # 1. PDF, DOCX, TXT, MD -> Document
-│   ├── text_cleaning/
-│   │   └── cleaner.py               # 2. bo'sh joylar, control belgilar, Unicode
-│   ├── metadata/
-│   │   └── metadata_builder.py      # 3. document_id (uuid5), source, page, .meta.json
-│   ├── chunking/
+│   ├── step2_metadata/
+│   │   └── metadata_builder.py      # 2. document_id (uuid5), source, page, .meta.json
+│   ├── step3_text_cleaning/
+│   │   └── cleaner.py               # 3. bo'sh joylar, control belgilar, Unicode
+│   ├── step4_chunking/
 │   │   └── text_splitter.py         # 4. token bo'yicha 500 / 50 chunk'lar
-│   ├── embeddings/
+│   ├── step5_embeddings/
 │   │   └── embedding_model.py       # 5. all-MiniLM-L6-v2 -> 384 o'lchamli vector
-│   ├── vector_store/
+│   ├── step6_vector_store/
 │   │   └── qdrant_store.py          # 6. id + vector + payload -> Qdrant
 │   └── pipeline.py                  # hamma bosqichlarni tartib bilan bog'laydi
 ├── scripts/
@@ -42,12 +42,12 @@ Loyiha ildizidagi umumiy fayllar (ikkala pipeline ham ishlatadi):
 
 | # | Bosqich | Fayl | Input -> Output |
 |---|---|---|---|
-| 1 | Document Loading | [loader.py](src/indexing/document_loading/loader.py) | papka -> `Document`'lar (PDF'da har sahifa alohida) |
-| 2 | Text Cleaning | [cleaner.py](src/indexing/text_cleaning/cleaner.py) | `Document` -> matni tozalangan `Document` |
-| 3 | Metadata | [metadata_builder.py](src/indexing/metadata/metadata_builder.py) | `Document` -> to'liq metadata'li `Document` |
-| 4 | Chunking | [text_splitter.py](src/indexing/chunking/text_splitter.py) | `Document` -> `Chunk`'lar (chunk_id, document_id, text, metadata) |
-| 5 | Embedding Generation | [embedding_model.py](src/indexing/embeddings/embedding_model.py) | chunk matnlari -> `(chunk_soni, 384)` numpy array |
-| 6 | Qdrant Storage | [qdrant_store.py](src/indexing/vector_store/qdrant_store.py) | chunk'lar + vector'lar -> Qdrant point'lari |
+| 1 | Document Loading | [loader.py](src/indexing/step1_document_loading/loader.py) | papka -> `Document`'lar (PDF'da har sahifa alohida) |
+| 2 | Metadata | [metadata_builder.py](src/indexing/step2_metadata/metadata_builder.py) | `Document` -> to'liq metadata'li `Document` |
+| 3 | Text Cleaning | [cleaner.py](src/indexing/step3_text_cleaning/cleaner.py) | `Document` -> matni tozalangan `Document` |
+| 4 | Chunking | [text_splitter.py](src/indexing/step4_chunking/text_splitter.py) | `Document` -> `Chunk`'lar (chunk_id, document_id, text, metadata) |
+| 5 | Embedding Generation | [embedding_model.py](src/indexing/step5_embeddings/embedding_model.py) | chunk matnlari -> `(chunk_soni, 384)` numpy array |
+| 6 | Qdrant Storage | [qdrant_store.py](src/indexing/step6_vector_store/qdrant_store.py) | chunk'lar + vector'lar -> Qdrant point'lari |
 
 ## Ishga tushirish (loyiha ildizidan)
 

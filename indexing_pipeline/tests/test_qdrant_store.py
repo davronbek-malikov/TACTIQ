@@ -14,10 +14,10 @@ import pytest
 from qdrant_client import QdrantClient
 
 from config.settings import Settings
-from indexing.chunking import Chunk
-from indexing.metadata import make_document_id
+from indexing.step4_chunking import Chunk
+from indexing.step2_metadata import make_document_id
 from indexing.pipeline import run_indexing_pipeline
-from indexing.vector_store import QdrantStore
+from indexing.step6_vector_store import QdrantStore
 
 DIMENSION = 8
 
