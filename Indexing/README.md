@@ -25,15 +25,14 @@ Indexing/
 │
 ├── 01_documents/
 │   ├── sample_docs/              # 5 ta namunaviy futbol hujjati (PDF, DOCX, TXT, MD) + .meta.json
-│   ├── my_documents/             # o'zingizning fayllaringiz (git'ga tushmaydi)
-│   └── scripts/show_documents.py
+│   └── my_documents/             # o'zingizning fayllaringiz (git'ga tushmaydi)
 │
 ├── 02_document_loading/
 │   ├── src/document_loading/
-│   │   ├── document.py           # Document dataclass
-│   │   ├── loader.py             # 2.1 Load      — PDF/DOCX/TXT/MD -> matn
-│   │   ├── metadata_builder.py   # 2.2 Metadata  — document_id, source, page, topic ...
-│   │   └── cleaner.py            # 2.3 Cleaning  — ortiqcha bo'sh joy, ko'rinmas belgilar
+│   │   ├── step0_document.py     # Document dataclass
+│   │   ├── step1_load.py         # 2.1 Load      — PDF/DOCX/TXT/MD -> matn
+│   │   ├── step2_metadata.py     # 2.2 Metadata  — document_id, source, page, topic ...
+│   │   └── step3_cleaning.py     # 2.3 Cleaning  — ortiqcha bo'sh joy, ko'rinmas belgilar
 │   ├── scripts/run_document_loading.py
 │   └── tests/
 │
@@ -50,8 +49,8 @@ Indexing/
 │
 └── 05_vector_database/
     ├── src/vector_database/qdrant_store.py   # id + vector + payload -> Qdrant
-    ├── scripts/run_vector_database.py        # butun pipeline + Qdrant'dagi point'ni ko'rsatadi
-    ├── scripts/inspect_collection.py
+    ├── scripts/step1_run_vector_database.py   # butun pipeline + Qdrant'dagi point'ni ko'rsatadi
+    ├── scripts/step2_inspect_collection.py    # collection'da nima saqlanganini ko'rsatadi
     └── tests/
 ```
 
@@ -64,11 +63,11 @@ Har bir bosqich nazariyasidan keyin o'sha bosqich skriptini ishga tushiring (loy
 
 | Bosqich | Nazariya | Amaliyot | Nima ko'rinadi |
 |---|---|---|---|
-| 01 Documents | [README](01_documents/README.md) | `python Indexing/01_documents/scripts/show_documents.py` | fayllar, formatlar, sidecar bor-yo'qligi |
+| 01 Documents | [README](01_documents/README.md) | VS Code'da `01_documents/sample_docs/` papkasini ochish | fayllar, formatlar, `.meta.json` sidecar'lar |
 | 02 Document Loading | [README](02_document_loading/README.md) | `python Indexing/02_document_loading/scripts/run_document_loading.py` | o'qilgan matnlar, metadata, tozalash oldin/keyin |
 | 03 Chunking | [README](03_chunking/README.md) | `python Indexing/03_chunking/scripts/run_chunking.py --chunk-size 120 --overlap 20` | token'lar, chunk'lar, overlap |
 | 04 Embedding Model | [README](04_embedding_model/README.md) | `python Indexing/04_embedding_model/scripts/run_embedding.py` | 384 ta son, norm = 1, ma'no yaqinligi |
-| 05 Vector Database | [README](05_vector_database/README.md) | `python Indexing/05_vector_database/scripts/run_vector_database.py` | Qdrant'dagi point: id + vector + payload |
+| 05 Vector Database | [README](05_vector_database/README.md) | `python Indexing/05_vector_database/scripts/step1_run_vector_database.py` | Qdrant'dagi point: id + vector + payload |
 
 Butun pipeline bitta buyruq bilan:
 
@@ -96,11 +95,11 @@ pytest Indexing/03_chunking                # faqat bitta bosqich testlari
 
 ## Mashqlar
 
-1. **01:** `my_documents/` ga o'z PDF yoki DOCX faylingizni qo'ying va `show_documents.py --data-dir Indexing/01_documents/my_documents` ni ishga tushiring.
+1. **01:** `my_documents/` ga o'z PDF yoki DOCX faylingizni qo'ying va unga `.meta.json` sidecar yozing.
 2. **02:** `my_documents/` ga `broken.pdf` nomli oddiy matn fayl yarating — pipeline to'xtamasdan xatoni hisobotda ko'rsatishini tekshiring.
 3. **03:** `--chunk-size 120 --overlap 20` va `--chunk-size 500 --overlap 50` natijalarini solishtiring.
 4. **04:** Nima uchun `chunk_size=500 > max_seq_length=256` ogohlantirishi chiqadi? `.env`da `TACTIQ_CHUNK_SIZE=256`, `TACTIQ_CHUNK_OVERLAP=25`, `QDRANT_COLLECTION=tactiq_256` qilib qayta ishga tushiring.
-5. **05:** `run_vector_database.py` ni ikki marta ishga tushiring — point'lar soni o'zgarmasligi kerak. Nima uchun?
+5. **05:** `step1_run_vector_database.py` ni ikki marta ishga tushiring — point'lar soni o'zgarmasligi kerak. Nima uchun?
 
 ## Keyingi pipeline bilan bog'liqlik
 

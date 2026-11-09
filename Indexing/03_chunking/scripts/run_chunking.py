@@ -7,9 +7,9 @@
 Kichik chunk_size bilan ishga tushirsangiz, overlap'ni ko'z bilan ko'rish osonroq.
 """
 
-import argparse  # argparse — command line argumentlari (--chunk-size, --overlap)
-import sys  # sys.path — import yo'llari
-from pathlib import Path  # Path — fayl yo'llari
+import argparse
+import sys
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # Indexing/ papkasi
 import indexing_paths  # noqa: F401,E402

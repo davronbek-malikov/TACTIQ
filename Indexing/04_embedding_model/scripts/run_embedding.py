@@ -4,9 +4,9 @@
     python Indexing/04_embedding_model/scripts/run_embedding.py
 """
 
-import argparse  # argparse — command line argumentlari
-import sys  # sys.path — import yo'llari
-from pathlib import Path  # Path — fayl yo'llari
+import argparse
+import sys
+from pathlib import Path
 
 import numpy as np  # numpy — vector'lar bilan hisob-kitob (uzunlik, dot product)
 

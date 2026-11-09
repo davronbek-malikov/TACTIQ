@@ -21,13 +21,13 @@
 
 ```bash
 docker compose up -d qdrant                                          # avval Qdrant
-python Indexing/05_vector_database/scripts/run_vector_database.py    # 02 -> 05 butun pipeline + bitta point
-python Indexing/05_vector_database/scripts/inspect_collection.py     # collection'da nima bor
+python Indexing/05_vector_database/scripts/step1_run_vector_database.py    # 02 -> 05 butun pipeline + bitta point
+python Indexing/05_vector_database/scripts/step2_inspect_collection.py     # collection'da nima bor
 ```
 
 Brauzerda: <http://localhost:6333/dashboard> → `tactiq_documents` collection.
 
-`run_vector_database.py` ni **ikki marta** ishga tushiring — "jami point'lar" soni o'zgarmasligi kerak.
+`step1_run_vector_database.py` ni **ikki marta** ishga tushiring — "jami point'lar" soni o'zgarmasligi kerak.
 
 ## Testlar
 

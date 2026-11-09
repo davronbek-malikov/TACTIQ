@@ -22,10 +22,8 @@
 
 ## Amaliyot
 
-```bash
-python Indexing/01_documents/scripts/show_documents.py
-python Indexing/01_documents/scripts/show_documents.py --data-dir Indexing/01_documents/my_documents
-```
+VS Code'da `sample_docs/` papkasini oching: 5 ta hujjat va har birining yonidagi `.meta.json` faylni ko'ring.
+Bitta sidecar'ni ochib, ichidagi `topic` va `language` maydonlarini tekshiring.
 
 Sidecar namunasi (`<fayl>.meta.json`):
 

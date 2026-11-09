@@ -1,18 +1,8 @@
 """
-Settings — loyiha sozlamalari
+Settings — barcha sozlamalar bitta joyda.
 
-Bu modul barcha sozlamalarni (fayl yo'llari, chunk o'lchami, embedding model nomi,
-Qdrant manzili) bitta joyda saqlaydi. Sozlamalar environment variable'lardan o'qiladi,
-agar ular berilmagan bo'lsa — default qiymat ishlatiladi.
-
-Environment variable nima?
-    Operatsion tizim darajasidagi "kalit = qiymat" juftligi. Masalan:
-        QDRANT_URL=http://localhost:6333
-    Ularni kodga yozmaymiz (hard-code qilmaymiz), chunki:
-      * parol va API key'lar GitHub'ga tushib qolmasligi kerak;
-      * bir xil kod turli muhitda (laptop, server, cloud) turli sozlama bilan ishlashi kerak.
-    `.env` fayli — shu o'zgaruvchilarni yozib qo'yadigan oddiy matn fayl.
-    U `.gitignore`da, ya'ni hech qachon commit qilinmaydi. Namuna: `.env.example`.
+Qiymatlar .env faylidan (environment variable) o'qiladi, bo'lmasa — default ishlatiladi.
+.env git'ga tushmaydi (parol va API key'lar uchun). Namuna: .env.example
 """
 
 import os
@@ -22,22 +12,12 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
-# Path — fayl yo'llari bilan ishlash uchun class (pathlib moduli).
-# Oddiy string o'rniga Path ishlatsak, "/" operatori bilan yo'llarni qo'shish mumkin
-# va kod Windows hamda Linux'da bir xil ishlaydi.
-# __file__ — shu faylning yo'li. .parent ikki marta: config/settings.py -> config/ -> loyiha ildizi.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-# .env faylini o'qib, ichidagi qiymatlarni environment variable'larga qo'shadi.
-# Fayl bo'lmasa — xato bermaydi, shunchaki hech narsa qilmaydi.
-load_dotenv(PROJECT_ROOT / ".env")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent  # config/settings.py -> loyiha ildizi
+load_dotenv(PROJECT_ROOT / ".env")                     # .env bo'lmasa — hech narsa qilmaydi
 
 
 def _read_int(name: str, default: int) -> int:
-    """Environment variable'ni butun son (int) sifatida o'qiydi.
-
-    Environment variable'lar doim string bo'ladi, shuning uchun int() ga aylantiramiz.
-    """
+    """Environment variable'ni int sifatida o'qiydi."""
     value = os.getenv(name)
     if value is None or value.strip() == "":
         return default
@@ -45,70 +25,47 @@ def _read_int(name: str, default: int) -> int:
 
 
 def _read_optional(name: str) -> Optional[str]:
-    """Bo'sh string'ni None deb hisoblaydi (".env"da `QDRANT_API_KEY=` bo'sh qolishi mumkin)."""
+    """Bo'sh qiymatni None deb oladi."""
     value = os.getenv(name)
     if value is None or value.strip() == "":
         return None
     return value.strip()
 
 
-# @dataclass — class yozishni soddalashtiradigan decorator.
-# Biz faqat atributlarni (nom + type hint + default qiymat) yozamiz,
-# Python esa __init__(), __repr__() va __eq__() metodlarini avtomatik yaratadi.
-# Ya'ni `Settings(chunk_size=300)` deb obyekt yaratish mumkin, constructor'ni qo'lda yozmaymiz.
-#
-# frozen=True — obyekt yaratilgandan keyin uning qiymatlarini o'zgartirib bo'lmaydi.
-# Sozlamalar pipeline davomida tasodifan o'zgarib qolmasligi uchun shunday qilamiz.
-@dataclass(frozen=True)
+@dataclass(frozen=True)  # frozen — sozlamalar ish davomida tasodifan o'zgarmasin
 class Settings:
-    # Type hint (masalan `: Path`, `: int`) — qiymat qanday turda bo'lishi kerakligini bildiradi.
-    # Python buni majburlamaydi, lekin kodni o'qish va IDE yordami uchun juda foydali.
-
     # --- Fayllar ---
-    # 01 — Documents: default holatda namunaviy hujjatlar. O'z fayllaringiz uchun:
-    # TACTIQ_RAW_DATA_DIR=Indexing/01_documents/my_documents
-    raw_data_dir: Path = PROJECT_ROOT / "Indexing" / "01_documents" / "sample_docs"
-    # 03 — Chunking natijasi (chunks.jsonl) tekshirish uchun shu yerga yoziladi (git'ga tushmaydi)
-    processed_data_dir: Path = PROJECT_ROOT / "Indexing" / "03_chunking" / "output"
+    raw_data_dir: Path = PROJECT_ROOT / "Indexing" / "01_documents" / "sample_docs"   # 01 — hujjatlar
+    processed_data_dir: Path = PROJECT_ROOT / "Indexing" / "03_chunking" / "output"   # chunks.jsonl
 
-    # --- Chunking ---
-    chunk_size: int = 500     # bitta chunk'dagi maksimal token soni
-    chunk_overlap: int = 50   # qo'shni chunk'lar orasida takrorlanadigan token soni
+    # --- Chunking (token'da) ---
+    chunk_size: int = 500
+    chunk_overlap: int = 50
 
-    # --- Embeddings ---
+    # --- Embedding ---
     embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     embedding_batch_size: int = 32
 
     # --- Qdrant ---
-    # Optional[str] — qiymat yo string, yo None bo'lishi mumkin degani.
     qdrant_url: str = "http://localhost:6333"
     qdrant_api_key: Optional[str] = None
     qdrant_collection: str = "tactiq_documents"
-    # Agar berilsa, Qdrant server o'rniga diskdagi papkada ishlaydigan "local mode" ishlatiladi
-    # (Docker o'rnatilmagan kompyuterlar uchun qulay).
-    qdrant_local_path: Optional[str] = None
+    qdrant_local_path: Optional[str] = None   # berilsa — Docker'siz, diskdagi papkada ishlaydi
 
 
 def _read_path(name: str, default: Path) -> Path:
-    """Environment variable'dagi yo'lni o'qiydi.
-
-    Nisbiy yo'l (masalan "Indexing/01_documents/my_documents") loyiha ildiziga nisbatan olinadi —
-    shunda skript qaysi papkadan ishga tushirilishidan qat'i nazar bir xil papka topiladi.
-    """
+    """Yo'lni o'qiydi. Nisbiy yo'l loyiha ildiziga nisbatan olinadi."""
     value = os.getenv(name)
     if value is None or value.strip() == "":
         return default
     path = Path(value.strip())
-    if not path.is_absolute():  # .is_absolute() — "C:/..." yoki "/..." bilan boshlanadimi?
+    if not path.is_absolute():
         path = PROJECT_ROOT / path
     return path
 
 
 def get_settings() -> Settings:
-    """Environment variable'lardan Settings obyektini yaratadi.
-
-    Output: Settings — butun pipeline shu obyekt orqali sozlanadi.
-    """
+    """.env / environment variable'lardan Settings yaratadi."""
     defaults = Settings()
     return Settings(
         raw_data_dir=_read_path("TACTIQ_RAW_DATA_DIR", defaults.raw_data_dir),

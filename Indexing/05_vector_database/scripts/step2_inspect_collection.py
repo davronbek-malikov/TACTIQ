@@ -1,19 +1,19 @@
 """
 Qdrant collection'ini ko'rib chiqish: o'lcham, point soni va bir nechta namunaviy payload.
 
-    python Indexing/05_vector_database/scripts/inspect_collection.py
-    python Indexing/05_vector_database/scripts/inspect_collection.py --limit 5
+    python Indexing/05_vector_database/scripts/step2_inspect_collection.py
+    python Indexing/05_vector_database/scripts/step2_inspect_collection.py --limit 5
 
 Bu similarity search EMAS — faqat nima saqlanganini tekshirish (scroll).
 Qdrant server ishlayotgan bo'lsa, brauzerda ham ko'rish mumkin: http://localhost:6333/dashboard
 """
 
-import argparse  # argparse — command line argumentlarini (--limit) o'qish
-import sys  # sys — import yo'llari (sys.path) va dasturdan chiqish (sys.exit)
-from pathlib import Path  # Path — fayl yo'llari
+import argparse
+import sys
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # Indexing/ papkasi
-import indexing_paths  # noqa: F401,E402  — config/ va barcha src/ papkalarni import qilish mumkin qiladi
+import indexing_paths  # noqa: F401,E402
 
 from config.settings import get_settings  # noqa: E402
 from vector_database import QdrantStore, create_qdrant_client  # noqa: E402  — faqat 05-bosqich kerak
@@ -30,7 +30,7 @@ def main() -> int:
     store = QdrantStore(client, settings.qdrant_collection)
 
     if not client.collection_exists(settings.qdrant_collection):
-        print(f"Collection '{settings.qdrant_collection}' topilmadi. Avval: python Indexing/05_vector_database/scripts/run_vector_database.py")
+        print(f"Collection '{settings.qdrant_collection}' topilmadi. Avval: python Indexing/05_vector_database/scripts/step1_run_vector_database.py")
         return 1
 
     print(f"Collection:       {settings.qdrant_collection}")

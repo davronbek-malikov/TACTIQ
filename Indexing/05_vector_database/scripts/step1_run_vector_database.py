@@ -5,14 +5,14 @@ Bu oxirgi bosqich, shuning uchun 02 -> 03 -> 04 -> 05 hammasi ishlaydi (butun pi
 Keyin Qdrant'da nima saqlanganini ko'rsatadi.
 
     docker compose up -d qdrant          # avval Qdrant'ni ishga tushiring
-    python Indexing/05_vector_database/scripts/run_vector_database.py
+    python Indexing/05_vector_database/scripts/step1_run_vector_database.py
 
 Ikki marta ishga tushirib ko'ring: point'lar soni o'zgarmasligi kerak (barqaror ID + upsert).
 """
 
-import argparse  # argparse — command line argumentlari
-import sys  # sys.path va sys.exit
-from pathlib import Path  # Path — fayl yo'llari
+import argparse
+import sys
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # Indexing/ papkasi
 import indexing_paths  # noqa: F401,E402
@@ -47,7 +47,7 @@ def main() -> int:
     client.close()
 
     print("\nBrauzerda ko'rish: http://localhost:6333/dashboard")
-    print("Batafsil: python Indexing/05_vector_database/scripts/inspect_collection.py")
+    print("Batafsil: python Indexing/05_vector_database/scripts/step2_inspect_collection.py")
     return 1 if summary.failed_files else 0
 
 

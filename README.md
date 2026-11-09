@@ -361,7 +361,7 @@ TACTIQ/
 │   └── settings.py            # all settings, read from environment variables
 │
 ├── Indexing/                  # first pipeline — implemented (own README in Uzbek)
-│   ├── 01_documents/          # sample_docs/, my_documents/, scripts/show_documents.py
+│   ├── 01_documents/          # sample_docs/, my_documents/ (input data only)
 │   ├── 02_document_loading/   # src/document_loading/ (loader, metadata_builder, cleaner), scripts/, tests/
 │   ├── 03_chunking/           # src/chunking/, scripts/run_chunking.py, tests/
 │   ├── 04_embedding_model/    # src/embedding_model/, scripts/run_embedding.py, tests/
@@ -431,11 +431,10 @@ Without Docker, set `QDRANT_LOCAL_PATH=qdrant_local` in `.env` to use Qdrant's e
 
 ```bash
 # step by step (one practice script per step)
-python Indexing/01_documents/scripts/show_documents.py
 python Indexing/02_document_loading/scripts/run_document_loading.py
 python Indexing/03_chunking/scripts/run_chunking.py --chunk-size 120 --overlap 20
 python Indexing/04_embedding_model/scripts/run_embedding.py
-python Indexing/05_vector_database/scripts/run_vector_database.py
+python Indexing/05_vector_database/scripts/step1_run_vector_database.py
 
 # the whole pipeline in one command (default: the bundled educational samples)
 python Indexing/indexing_pipeline.py
@@ -444,7 +443,7 @@ python Indexing/indexing_pipeline.py
 python Indexing/indexing_pipeline.py --data-dir Indexing/01_documents/my_documents
 
 # check what was stored
-python Indexing/05_vector_database/scripts/inspect_collection.py --limit 3
+python Indexing/05_vector_database/scripts/step2_inspect_collection.py --limit 3
 ```
 
 To attach optional metadata to a document, create a sidecar next to it, for example

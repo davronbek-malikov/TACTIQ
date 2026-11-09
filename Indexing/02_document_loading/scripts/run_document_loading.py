@@ -5,10 +5,10 @@
     python Indexing/02_document_loading/scripts/run_document_loading.py --data-dir Indexing/01_documents/my_documents
 """
 
-import argparse  # argparse — command line argumentlari
-import json  # json.dumps — metadata dict'ini chiroyli (indent bilan) chiqarish uchun
-import sys  # sys.path — import yo'llari
-from pathlib import Path  # Path — fayl yo'llari
+import argparse
+import json
+import sys
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # Indexing/ papkasi
 import indexing_paths  # noqa: F401,E402
