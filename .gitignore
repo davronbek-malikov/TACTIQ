@@ -29,10 +29,9 @@ data/private/
 Thumbs.db
 .vscode/
 
-# TACTIQ data folders: keep the structure, not the contents
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
+# TACTIQ Indexing: students' own documents and generated chunk files stay local
+Indexing/01_documents/my_documents/*
+!Indexing/01_documents/my_documents/.gitkeep
+Indexing/03_chunking/output/
 qdrant_local/
 .pytest_cache/

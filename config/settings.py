@@ -65,8 +65,11 @@ class Settings:
     # Python buni majburlamaydi, lekin kodni o'qish va IDE yordami uchun juda foydali.
 
     # --- Fayllar ---
-    raw_data_dir: Path = PROJECT_ROOT / "data" / "raw"
-    processed_data_dir: Path = PROJECT_ROOT / "data" / "processed"
+    # 01 — Documents: default holatda namunaviy hujjatlar. O'z fayllaringiz uchun:
+    # TACTIQ_RAW_DATA_DIR=Indexing/01_documents/my_documents
+    raw_data_dir: Path = PROJECT_ROOT / "Indexing" / "01_documents" / "sample_docs"
+    # 03 — Chunking natijasi (chunks.jsonl) tekshirish uchun shu yerga yoziladi (git'ga tushmaydi)
+    processed_data_dir: Path = PROJECT_ROOT / "Indexing" / "03_chunking" / "output"
 
     # --- Chunking ---
     chunk_size: int = 500     # bitta chunk'dagi maksimal token soni
@@ -86,6 +89,21 @@ class Settings:
     qdrant_local_path: Optional[str] = None
 
 
+def _read_path(name: str, default: Path) -> Path:
+    """Environment variable'dagi yo'lni o'qiydi.
+
+    Nisbiy yo'l (masalan "Indexing/01_documents/my_documents") loyiha ildiziga nisbatan olinadi —
+    shunda skript qaysi papkadan ishga tushirilishidan qat'i nazar bir xil papka topiladi.
+    """
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return default
+    path = Path(value.strip())
+    if not path.is_absolute():  # .is_absolute() — "C:/..." yoki "/..." bilan boshlanadimi?
+        path = PROJECT_ROOT / path
+    return path
+
+
 def get_settings() -> Settings:
     """Environment variable'lardan Settings obyektini yaratadi.
 
@@ -93,8 +111,8 @@ def get_settings() -> Settings:
     """
     defaults = Settings()
     return Settings(
-        raw_data_dir=Path(os.getenv("TACTIQ_RAW_DATA_DIR", str(defaults.raw_data_dir))),
-        processed_data_dir=Path(os.getenv("TACTIQ_PROCESSED_DATA_DIR", str(defaults.processed_data_dir))),
+        raw_data_dir=_read_path("TACTIQ_RAW_DATA_DIR", defaults.raw_data_dir),
+        processed_data_dir=_read_path("TACTIQ_PROCESSED_DATA_DIR", defaults.processed_data_dir),
         chunk_size=_read_int("TACTIQ_CHUNK_SIZE", defaults.chunk_size),
         chunk_overlap=_read_int("TACTIQ_CHUNK_OVERLAP", defaults.chunk_overlap),
         embedding_model_name=os.getenv("TACTIQ_EMBEDDING_MODEL", defaults.embedding_model_name),
