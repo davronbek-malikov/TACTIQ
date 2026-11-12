@@ -17,3 +17,11 @@ python-dotenv>=0.21
 
 # Testing
 pytest>=7.4
+
+# Retrieval & Generation: one client for Qwen (Ollama), Groq and Gemini (OpenAI-compatible APIs)
+openai==3.48.0
+
+# UI backend (FastAPI)
+fastapi>=0.115
+uvicorn>=0.30
+python-multipart>=0.0.9

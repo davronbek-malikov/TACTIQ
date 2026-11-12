@@ -53,26 +53,26 @@ answer influences team selection, recruitment or a published article.
 
 ## 3. Why TACTIQ is more than a chatbot
 
-| Simple chatbot | TACTIQ |
-|---|---|
-| Answers from the model's memory | Answers from retrieved, citable evidence |
-| One modality (text) | Text, voice, image, video, documents, structured data |
-| One step: question → answer | Multi-step investigation: plan → gather → validate → answer |
-| No numbers it can verify | Statistics computed from data with SQL / Pandas |
-| Confident even when unsure | Separates facts, evidence, observations, hypotheses and unknowns |
-| Forgets the source | Keeps provenance for every piece of evidence |
+| Simple chatbot                  | TACTIQ                                                           |
+| ------------------------------- | ---------------------------------------------------------------- |
+| Answers from the model's memory | Answers from retrieved, citable evidence                         |
+| One modality (text)             | Text, voice, image, video, documents, structured data            |
+| One step: question → answer    | Multi-step investigation: plan → gather → validate → answer   |
+| No numbers it can verify        | Statistics computed from data with SQL / Pandas                  |
+| Confident even when unsure      | Separates facts, evidence, observations, hypotheses and unknowns |
+| Forgets the source              | Keeps provenance for every piece of evidence                     |
 
 ## 4. Who it is for
 
-| Audience | Typical use |
-|---|---|
-| **Football coaches** | Investigate tactical problems (e.g. struggles against a high press) and explore possible improvements. |
-| **Scouts and recruitment teams** | Compare players and identify candidates that fit a playing style. |
-| **Performance analysts** | Investigate match and player performance across phases of play. |
-| **Journalists and sports analysts** | Prepare evidence-based match analysis with citable sources. |
-| **Sporting directors and club management** | Support squad planning and strategic decisions with summarised evidence. |
-| **Researchers and data scientists** | Explore football data and test hypotheses reproducibly. |
-| **Educators and students** | Study tactical concepts and football analytics with grounded explanations. |
+| Audience                                         | Typical use                                                                                            |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| **Football coaches**                       | Investigate tactical problems (e.g. struggles against a high press) and explore possible improvements. |
+| **Scouts and recruitment teams**           | Compare players and identify candidates that fit a playing style.                                      |
+| **Performance analysts**                   | Investigate match and player performance across phases of play.                                        |
+| **Journalists and sports analysts**        | Prepare evidence-based match analysis with citable sources.                                            |
+| **Sporting directors and club management** | Support squad planning and strategic decisions with summarised evidence.                               |
+| **Researchers and data scientists**        | Explore football data and test hypotheses reproducibly.                                                |
+| **Educators and students**                 | Study tactical concepts and football analytics with grounded explanations.                             |
 
 ## 5. Example questions
 
@@ -91,14 +91,14 @@ answer influences team selection, recruitment or a published article.
 
 **Multimodal conversational assistant** — designed primarily for coaches, not a text-only chatbot:
 
-| Modality | Planned capabilities |
-|---|---|
-| **Text** | Natural-language questions, multi-turn conversation, context-aware follow-ups, tactical investigations |
-| **Image** | Tactical board photos, formation diagrams and tactical screenshots; extract visual information where technically possible |
-| **Video** | Analyse match clips, identify relevant timestamps, link observations to events, players and teams when identification is reliable, generate clip summaries |
-| **Voice / audio** | Speech-to-text questions, text-to-speech answers, hands-free conversation on the training ground |
-| **Documents** | PDF, DOCX, TXT, Markdown tactical reports, scouting reports and match analyses — **ingestion implemented** |
-| **Structured data** | Match, player, team and event statistics, comparisons and calculated metrics |
+| Modality                  | Planned capabilities                                                                                                                                       |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Text**            | Natural-language questions, multi-turn conversation, context-aware follow-ups, tactical investigations                                                     |
+| **Image**           | Tactical board photos, formation diagrams and tactical screenshots; extract visual information where technically possible                                  |
+| **Video**           | Analyse match clips, identify relevant timestamps, link observations to events, players and teams when identification is reliable, generate clip summaries |
+| **Voice / audio**   | Speech-to-text questions, text-to-speech answers, hands-free conversation on the training ground                                                           |
+| **Documents**       | PDF, DOCX, TXT, Markdown tactical reports, scouting reports and match analyses — **ingestion implemented**                                          |
+| **Structured data** | Match, player, team and event statistics, comparisons and calculated metrics                                                                               |
 
 **Intelligence:** multi-step investigation planning, automatic evidence retrieval, tool selection
 and orchestration, combining structured and unstructured information, player / team / match
@@ -209,15 +209,15 @@ flowchart TD
 
 ### 7.2 Layers
 
-| Layer | Responsibility | Status |
-|---|---|---|
-| **A. Presentation** | Next.js / React UI: chat and investigation interface, dashboard, match explorer, player and team intelligence, reports; voice, image and video upload. | Planned |
-| **B. Application** | FastAPI: API endpoints, authentication, permissions, request validation, business logic. | Planned |
-| **C. Investigation and orchestration** | **Conversation Engine** keeps multi-turn context. **AI Investigation Agent** understands the question, plans the investigation, selects tools (RAG, analytics, entity lookup, video), orchestrates retrieval and SQL, aggregates evidence and checks whether it is sufficient. | Planned |
-| **D. AI intelligence** | Five separate engines, described below. | Planned |
-| **E. Evidence and context** | Combines retrieved documents and analytical results, preserves source references, validates sufficiency, records limitations and uncertainty, and passes grounded evidence to the LLM. | Planned |
-| **F. Data and storage** | **Qdrant** stores chunk vectors and metadata payloads (**implemented**). **PostgreSQL** stores structured football data and relationships. **Object storage** keeps original documents, reports and video. | Qdrant implemented; others planned |
-| **G. Data ingestion** | **Document indexing pipeline** (**implemented**). Structured football data ingestion and video ingestion are separate, future modules. | Partially implemented |
+| Layer                                        | Responsibility                                                                                                                                                                                                                                                                             | Status                             |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| **A. Presentation**                    | Next.js / React UI: chat and investigation interface, dashboard, match explorer, player and team intelligence, reports; voice, image and video upload.                                                                                                                                     | Planned                            |
+| **B. Application**                     | FastAPI: API endpoints, authentication, permissions, request validation, business logic.                                                                                                                                                                                                   | Planned                            |
+| **C. Investigation and orchestration** | **Conversation Engine** keeps multi-turn context. **AI Investigation Agent** understands the question, plans the investigation, selects tools (RAG, analytics, entity lookup, video), orchestrates retrieval and SQL, aggregates evidence and checks whether it is sufficient. | Planned                            |
+| **D. AI intelligence**                 | Five separate engines, described below.                                                                                                                                                                                                                                                    | Planned                            |
+| **E. Evidence and context**            | Combines retrieved documents and analytical results, preserves source references, validates sufficiency, records limitations and uncertainty, and passes grounded evidence to the LLM.                                                                                                     | Planned                            |
+| **F. Data and storage**                | **Qdrant** stores chunk vectors and metadata payloads (**implemented**). **PostgreSQL** stores structured football data and relationships. **Object storage** keeps original documents, reports and video.                                                         | Qdrant implemented; others planned |
+| **G. Data ingestion**                  | **Document indexing pipeline** (**implemented**). Structured football data ingestion and video ingestion are separate, future modules.                                                                                                                                         | Partially implemented              |
 
 **AI intelligence layer components**
 
@@ -285,13 +285,13 @@ flowchart LR
     D --> E[("05 Vector Database<br/>Qdrant: vector + payload")]
 ```
 
-| Step | Folder | What it does |
-|---|---|---|
-| 01 Documents | `Indexing/01_documents/` | Input files. `sample_docs/` holds five educational samples (PDF, DOCX, TXT, MD) with `.meta.json` sidecars; `my_documents/` (git-ignored) is for your own files. |
+| Step                | Folder                            | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 01 Documents        | `Indexing/01_documents/`        | Input files. `sample_docs/` holds five educational samples (PDF, DOCX, TXT, MD) with `.meta.json` sidecars; `my_documents/` (git-ignored) is for your own files.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | 02 Document Loading | `Indexing/02_document_loading/` | **2.1 Load:** recursively discovers files; extracts text from PDF (one `Document` per page, page number kept), DOCX (paragraphs and tables), TXT and Markdown; unsupported files are skipped and corrupted files recorded as failures without stopping the run. **2.2 Metadata:** stable `document_id` (UUID5 of the relative path), source, file type, page; optional `document_type`, `topic`, `language`, `match_id`, `team_id`, `player_id` come **only** from a human-written sidecar, otherwise `None`. **2.3 Text Cleaning:** NFC normalisation, control-character removal, collapsing repeated spaces and blank lines; punctuation, case and terms like `4-3-3` or `xG` are preserved. |
-| 03 Chunking | `Indexing/03_chunking/` | Token-based fixed-size windows using the embedding model's own tokenizer (default 500 tokens, 50 overlap). Chunk text is sliced from the original text via token offsets, so case and spacing are preserved. Each chunk gets a stable `chunk_id`. |
-| 04 Embedding Model | `Indexing/04_embedding_model/` | Loads the Sentence Transformers model once, embeds in batches, L2-normalises vectors (cosine similarity = dot product), reads the vector dimension from real model output and validates shape and finite values. |
-| 05 Vector Database | `Indexing/05_vector_database/` | Creates the Qdrant collection with the actual dimension and cosine distance, adds payload indexes, deletes a document's old chunks and upserts the new ones in batches. Re-ingesting the same files never creates duplicates. |
+| 03 Chunking         | `Indexing/03_chunking/`         | Token-based fixed-size windows using the embedding model's own tokenizer (default 500 tokens, 50 overlap). Chunk text is sliced from the original text via token offsets, so case and spacing are preserved. Each chunk gets a stable `chunk_id`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 04 Embedding Model  | `Indexing/04_embedding_model/`  | Loads the Sentence Transformers model once, embeds in batches, L2-normalises vectors (cosine similarity = dot product), reads the vector dimension from real model output and validates shape and finite values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 05 Vector Database  | `Indexing/05_vector_database/`  | Creates the Qdrant collection with the actual dimension and cosine distance, adds payload indexes, deletes a document's old chunks and upserts the new ones in batches. Re-ingesting the same files never creates duplicates.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 **Chunk payload stored in Qdrant**
 
@@ -324,24 +324,24 @@ an embedding model with a longer context.
 
 ## 10. Technology stack
 
-| Technology | Role | Status |
-|---|---|---|
-| Python 3.11 | Core implementation | In use |
-| PyMuPDF | PDF text extraction | In use |
-| python-docx | DOCX text extraction | In use |
-| Hugging Face Transformers | Tokenizer for token-based chunking | In use |
-| Sentence Transformers | Embedding generation (`all-MiniLM-L6-v2`) | In use |
-| Qdrant (+ `qdrant-client`) | Vector database for chunks and metadata | In use |
-| Docker Compose | Local Qdrant service | In use |
-| python-dotenv | Configuration from `.env` | In use |
-| pytest | Unit and integration tests | In use |
-| PostgreSQL | Structured football data and relationships | Planned |
-| Pandas | Football analytics | Planned |
-| FastAPI | Backend API | Planned |
-| Next.js / React | Frontend | Planned |
-| LLM providers (Qwen, Ollama, vLLM, OpenAI-compatible) | LLM Engine | Planned |
-| Speech-to-text / text-to-speech models | Voice interaction | Planned |
-| YOLO + multi-object tracking | Video Intelligence (V2) | Planned |
+| Technology                                            | Role                                          | Status  |
+| ----------------------------------------------------- | --------------------------------------------- | ------- |
+| Python 3.11                                           | Core implementation                           | In use  |
+| PyMuPDF                                               | PDF text extraction                           | In use  |
+| python-docx                                           | DOCX text extraction                          | In use  |
+| Hugging Face Transformers                             | Tokenizer for token-based chunking            | In use  |
+| Sentence Transformers                                 | Embedding generation (`all-MiniLM-L6-v2`)   | In use  |
+| Qdrant (+ `qdrant-client`)                          | Vector database for chunks and metadata       | In use  |
+| Docker Compose                                        | Local Qdrant service                          | In use  |
+| python-dotenv                                         | Configuration from `.env`                   | In use  |
+| pytest                                                | Unit and integration tests                    | In use  |
+| PostgreSQL                                            | Structured football data and relationships    | Planned |
+| Pandas                                                | Football analytics                            | Planned |
+| FastAPI                                               | Local backend API for the UI (`UI/backend`) | In use  |
+| Next.js / React + Tailwind                            | Frontend (`UI/frontend`)                    | In use  |
+| LLM providers (Qwen, Ollama, vLLM, OpenAI-compatible) | LLM Engine                                    | Planned |
+| Speech-to-text / text-to-speech models                | Voice interaction                             | Planned |
+| YOLO + multi-object tracking                          | Video Intelligence (V2)                       | Planned |
 
 The indexing pipeline is deliberately written by hand instead of with LangChain or LlamaIndex,
 so every step is visible, testable and replaceable.
@@ -370,7 +370,11 @@ TACTIQ/
 │   ├── indexing_pipeline.ipynb  # step-by-step walkthrough
 │   └── indexing_paths.py      # import paths for config/ and every step's src/
 │
-├── Retrieval_Generation/      # second pipeline — planned, same layout
+├── Retrieval_Generation/      # second pipeline — implemented (own README in Uzbek)
+│   ├── 01_user_question/ … 07_answer_sources/   # one folder per step: README.md + one code file
+│   └── rag_pipeline.py        # runs 01 -> 07: question -> answer + sources
+│
+├── UI/                        # local app: FastAPI backend + Next.js frontend (own README in Uzbek)
 │
 └── Extra/                     # material kept for later use, not part of the TACTIQ package
 ```
@@ -385,6 +389,9 @@ Code comments and docstrings are written in Uzbek (Latin script) for educational
 terms, identifiers and library names stay in English.
 
 ## 12. Getting started
+
+> **Local app (UI):** see [UI/README.md](UI/README.md) — start Qdrant, then `python UI/backend/main.py`
+> and `npm run dev` in `UI/frontend`, open http://localhost:3000.
 
 ### 12.1 Install
 
@@ -404,16 +411,16 @@ The first run downloads the embedding model (about 90 MB) from Hugging Face.
 cp .env.example .env      # Windows PowerShell: Copy-Item .env.example .env
 ```
 
-| Variable | Default | Meaning |
-|---|---|---|
-| `QDRANT_URL` | `http://localhost:6333` | Qdrant server URL |
-| `QDRANT_API_KEY` | empty | Needed for Qdrant Cloud or a secured server |
-| `QDRANT_COLLECTION` | `tactiq_documents` | Collection name |
-| `QDRANT_LOCAL_PATH` | empty | If set, use Qdrant local mode in this folder (no Docker) |
-| `TACTIQ_RAW_DATA_DIR` | `Indexing/01_documents/sample_docs` | Folder to ingest (relative paths are resolved from the project root) |
-| `TACTIQ_EMBEDDING_MODEL` | `sentence-transformers/all-MiniLM-L6-v2` | Embedding model |
-| `TACTIQ_CHUNK_SIZE` / `TACTIQ_CHUNK_OVERLAP` | `500` / `50` | Chunking, in tokens |
-| `TACTIQ_EMBEDDING_BATCH_SIZE` | `32` | Texts per embedding batch |
+| Variable                                         | Default                                    | Meaning                                                              |
+| ------------------------------------------------ | ------------------------------------------ | -------------------------------------------------------------------- |
+| `QDRANT_URL`                                   | `http://localhost:6333`                  | Qdrant server URL                                                    |
+| `QDRANT_API_KEY`                               | empty                                      | Needed for Qdrant Cloud or a secured server                          |
+| `QDRANT_COLLECTION`                            | `tactiq_documents`                       | Collection name                                                      |
+| `QDRANT_LOCAL_PATH`                            | empty                                      | If set, use Qdrant local mode in this folder (no Docker)             |
+| `TACTIQ_RAW_DATA_DIR`                          | `Indexing/01_documents/sample_docs`      | Folder to ingest (relative paths are resolved from the project root) |
+| `TACTIQ_EMBEDDING_MODEL`                       | `sentence-transformers/all-MiniLM-L6-v2` | Embedding model                                                      |
+| `TACTIQ_CHUNK_SIZE` / `TACTIQ_CHUNK_OVERLAP` | `500` / `50`                           | Chunking, in tokens                                                  |
+| `TACTIQ_EMBEDDING_BATCH_SIZE`                  | `32`                                     | Texts per embedding batch                                            |
 
 Changing the embedding model changes the vector dimension: use a new collection name.
 
@@ -473,26 +480,28 @@ sample documents.
 
 ## 14. Current development status
 
-| Module | Status |
-|---|---|
-| Document indexing pipeline (load → metadata → clean → chunk → embed → Qdrant) | ✅ Implemented and tested |
-| Retrieval (semantic, keyword / BM25, hybrid, RRF, reranking) | Not implemented |
-| LLM Engine and grounded generation | Not implemented |
-| Football Analytics Engine (PostgreSQL, SQL, Pandas) | Not implemented |
-| Structured football data ingestion | Not implemented |
-| Knowledge and Entity Layer | Not implemented |
-| Evidence aggregation and validation | Not implemented |
-| AI Investigation Agent and Conversation Engine | Not implemented |
-| Multimodal input (voice, image) | Not implemented |
-| FastAPI backend, authentication | Not implemented |
-| Next.js frontend | Not implemented |
-| Evaluation | Not implemented |
-| Video Intelligence (V2) | Not implemented |
+| Module                                                                                                               | Status                           |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| Document indexing pipeline (load → metadata → clean → chunk → embed → Qdrant)                                   | ✅ Implemented and tested        |
+| Retrieval & Generation pipeline (query embedding → similarity search → top-k → prompt → LLM → answer + sources) | ✅ Implemented (semantic search) |
+| Keyword / BM25, hybrid search, RRF, reranking                                                                        | Not implemented                  |
+| LLM providers: Qwen via Ollama (local), Groq, Gemini (OpenAI-compatible API)                                         | ✅ Implemented                   |
+| Football Analytics Engine (PostgreSQL, SQL, Pandas)                                                                  | Not implemented                  |
+| Structured football data ingestion                                                                                   | Not implemented                  |
+| Knowledge and Entity Layer                                                                                           | Not implemented                  |
+| Evidence aggregation and validation                                                                                  | Not implemented                  |
+| AI Investigation Agent and Conversation Engine                                                                       | Not implemented                  |
+| Multimodal input (voice, image)                                                                                      | Not implemented                  |
+| FastAPI backend (local, no auth) — documents, indexing jobs, investigate                                            | ✅ Implemented                   |
+| Authentication                                                                                                       | Not implemented                  |
+| Next.js frontend — Overview, Investigate, Knowledge, Reports, Settings (Matches, Players, video: planned UI)        | ✅ Implemented                   |
+| Evaluation                                                                                                           | Not implemented                  |
+| Video Intelligence (V2)                                                                                              | Not implemented                  |
 
 ## 15. Roadmap
 
 1. **Indexing** — document ingestion into Qdrant ✅
-2. **Retrieval** — query embedding with the same model, semantic search, metadata filters
+2. **Retrieval & Generation** — semantic search, top-k, grounded prompt, Qwen / Groq / Gemini ✅
 3. **Search quality** — keyword search, hybrid retrieval with RRF, reranking
 4. **LLM Engine** — provider-independent interface, grounded answers with citations
 5. **Evaluation** — question sets, retrieval and answer-faithfulness metrics
@@ -522,14 +531,14 @@ sample documents.
 TACTIQ must **never invent football statistics or tactical observations**. Every future answer
 should distinguish between:
 
-| Category | Example |
-|---|---|
-| **Verified fact / statistic** | A number computed from match data with a reproducible query |
-| **Retrieved document evidence** | A passage from a cited report, with source and page |
-| **Analytical observation** | An interpretation derived from the facts above |
-| **Hypothesis** | A plausible explanation that the available data does not confirm |
-| **Recommendation** | A suggested action, linked to the evidence behind it |
-| **Cannot be verified** | Questions the available data cannot answer, stated explicitly |
+| Category                              | Example                                                          |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| **Verified fact / statistic**   | A number computed from match data with a reproducible query      |
+| **Retrieved document evidence** | A passage from a cited report, with source and page              |
+| **Analytical observation**      | An interpretation derived from the facts above                   |
+| **Hypothesis**                  | A plausible explanation that the available data does not confirm |
+| **Recommendation**              | A suggested action, linked to the evidence behind it             |
+| **Cannot be verified**          | Questions the available data cannot answer, stated explicitly    |
 
 These principles already shape the indexing pipeline: metadata is never guessed, entity IDs stay
 empty unless provided, every chunk keeps its source, page and embedding model, and the ingestion

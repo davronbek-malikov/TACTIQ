@@ -35,3 +35,6 @@ Indexing/01_documents/my_documents/*
 Indexing/03_chunking/output/
 qdrant_local/
 .pytest_cache/
+
+# TACTIQ UI: backend runtime state (indexing history)
+UI/backend/runtime/

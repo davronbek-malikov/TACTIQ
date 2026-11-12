@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* TACTIQ dizayn tokenlari — faqat yorug' (light) tema */
+@theme inline {
+  --color-canvas: #f7f8f5;
+  --color-card: #ffffff;
+  --color-primary: #176b45;
+  --color-primary-hover: #12593a;
+  --color-primary-soft: #e8f1ea;
+  --color-ink: #202923;
+  --color-muted: #69756d;
+  --color-line: #e6eae5;
+  --color-subtle: #f1f4f0;
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecea;
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fdf3dc;
+  --color-info: #1d4f91;
+  --color-info-soft: #e8eff9;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Klaviatura bilan boshqarish uchun aniq fokus */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
