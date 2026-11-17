@@ -30,9 +30,9 @@ Indexing/
 ├── 02_document_loading/
 │   ├── src/document_loading/
 │   │   ├── step0_document.py     # Document dataclass
-│   │   ├── step1_load.py         # 2.1 Load      — PDF/DOCX/TXT/MD -> matn
-│   │   ├── step2_metadata.py     # 2.2 Metadata  — document_id, source, page, topic ...
-│   │   └── step3_cleaning.py     # 2.3 Cleaning  — ortiqcha bo'sh joy, ko'rinmas belgilar
+│   │   ├── step1_load.py         # 2.1 Load, PDF/DOCX/TXT/MD -> matn
+│   │   ├── step2_metadata.py     # 2.2 Metadata, document_id, source, page, topic ...
+│   │   └── step3_cleaning.py     # 2.3 Cleaning, ortiqcha bo'sh joy, ko'rinmas belgilar
 │   ├── scripts/run_document_loading.py
 │   └── tests/
 │

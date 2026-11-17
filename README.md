@@ -360,7 +360,7 @@ TACTIQ/
 ├── config/
 │   └── settings.py            # all settings, read from environment variables
 │
-├── Indexing/                  # first pipeline — implemented (own README in Uzbek)
+├── Indexing/                  # first pipeline, implemented (own README in Uzbek)
 │   ├── 01_documents/          # sample_docs/, my_documents/ (input data only)
 │   ├── 02_document_loading/   # src/document_loading/ (loader, metadata_builder, cleaner), scripts/, tests/
 │   ├── 03_chunking/           # src/chunking/, scripts/run_chunking.py, tests/
@@ -370,7 +370,7 @@ TACTIQ/
 │   ├── indexing_pipeline.ipynb  # step-by-step walkthrough
 │   └── indexing_paths.py      # import paths for config/ and every step's src/
 │
-├── Retrieval_Generation/      # second pipeline — implemented (own README in Uzbek)
+├── Retrieval_Generation/      # second pipeline, implemented (own README in Uzbek)
 │   ├── 01_user_question/ … 07_answer_sources/   # one folder per step: README.md + one code file
 │   └── rag_pipeline.py        # runs 01 -> 07: question -> answer + sources
 │
