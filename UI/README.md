@@ -1,4 +1,4 @@
-# UI — TACTIQ ilovasi (frontend + backend)
+# UI: TACTIQ ilovasi (frontend + backend)
 
 Ikki pipeline'ni brauzerda ko'rsatadigan ilova:
 
@@ -6,7 +6,7 @@ Ikki pipeline'ni brauzerda ko'rsatadigan ilova:
 Brauzer (Next.js, :3000)  ->  Backend (FastAPI, :8000)  ->  Indexing + Retrieval_Generation kodi  ->  Qdrant (:6333)
 ```
 
-Brauzer Qdrant'ga to'g'ridan-to'g'ri ulanmaydi — hammasi backend orqali. Backend yangi pipeline yozmaydi:
+Brauzer Qdrant'ga to'g'ridan-to'g'ri ulanmaydi, hammasi backend orqali. Backend yangi pipeline yozmaydi:
 `Indexing/indexing_pipeline.py` va `Retrieval_Generation` bosqich funksiyalarini **import qiladi**.
 
 ## Tuzilma
@@ -30,13 +30,13 @@ UI/
 
 ## Ishga tushirish (3 ta terminal, loyiha ildizidan)
 
-**1. Qdrant** — ikki variantdan biri:
+**1. Qdrant**: ikki variantdan biri:
 
 ```Shell
 docker compose up -d qdrant
 ```
 
-Docker ishlamasa: `.env` faylida `QDRANT_LOCAL_PATH=qdrant_local` — Qdrant diskdagi papkada ishlaydi (Docker kerak emas).
+Docker ishlamasa: `.env` faylida `QDRANT_LOCAL_PATH=qdrant_local`: Qdrant diskdagi papkada ishlaydi (Docker kerak emas).
 
 **2. Backend** (`.venv` yoqilgan bo'lsin):
 
@@ -56,7 +56,7 @@ npm run dev                        # http://localhost:3000
 Brauzerda **http://localhost:3000** ni oching → **Knowledge** → *Sample documents → Index* → **Investigate**.
 
 **LLM** (kamida bittasi, `.env` da): `GROQ_API_KEY`, `GEMINI_API_KEY` yoki Ollama (`ollama pull qwen2.5:1.5b`).
-LLM sozlanmagan bo'lsa ham dalillar (evidence) topiladi — faqat javob o'rniga aniq xato ko'rsatiladi.
+LLM sozlanmagan bo'lsa ham dalillar (evidence) topiladi, faqat javob o'rniga aniq xato ko'rsatiladi.
 
 ## Backend endpoint'lari
 
@@ -82,7 +82,7 @@ LLM sozlanmagan bo'lsa ham dalillar (evidence) topiladi — faqat javob o'rniga 
 | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
 | Overview: Qdrant holati, hujjatlar/chunk'lar soni, indexing tarixi                               | Matches: tuzilgan o'yin ma'lumotlari (PostgreSQL)                               |
 | Knowledge: yuklash, indexing, jadval, tafsilot, metadata tahriri, o'chirish                      | Players: o'yinchi profillari va statistika                                      |
-| Investigate: 3 ta LLM, manbalar/filterlar, javob + bosiladigan `[1]` manbalar, 7 bosqich vaqti | Video workspace (V2): player, timeline, klip, kuzatuvlar — komponentlar tayyor |
+| Investigate: 3 ta LLM, manbalar/filterlar, javob + bosiladigan `[1]` manbalar, 7 bosqich vaqti | Video workspace (V2): player, timeline, klip, kuzatuvlar, komponentlar tayyor |
 | Reports: tekshiruvni saqlash (brauzerda) va Markdown eksport                                     | PDF eksport, rasm/ovoz/video kirish                                             |
 
 Hech qayerda soxta javob, soxta son yoki soxta "ulandi" holati ko'rsatilmaydi.

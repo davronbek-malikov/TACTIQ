@@ -33,14 +33,14 @@ python Retrieval_Generation/rag_pipeline.py --llm groq --question "What is a low
 1. **Indexing bajarilgan bo'lishi kerak:** `python Indexing/indexing_pipeline.py` (Qdrant'da chunk'lar bo'lsin).
 2. **LLM:** kamida bittasini sozlang (`.env.example` → `.env`):
    - **qwen:** [Ollama](https://ollama.com) o'rnating, so'ng `ollama pull qwen2.5:1.5b`
-   - **groq:** `GROQ_API_KEY=` — kalit: https://console.groq.com/keys
-   - **gemini:** `GEMINI_API_KEY=` — kalit: https://aistudio.google.com/apikey
+   - **groq:** `GROQ_API_KEY=`: kalit: https://console.groq.com/keys
+   - **gemini:** `GEMINI_API_KEY=`: kalit: https://aistudio.google.com/apikey
 
 ## Indexing bilan bog'liqlik
 
-- **02** — Indexing'dagi `EmbeddingModel` import qilinadi (bir xil model).
-- **03** — Indexing to'ldirgan `tactiq_documents` collection'idan qidiriladi.
-- **07** — payload'dagi `source` va `page` manba sifatida ko'rsatiladi.
+- **02**: Indexing'dagi `EmbeddingModel` import qilinadi (bir xil model).
+- **03**: Indexing to'ldirgan `tactiq_documents` collection'idan qidiriladi.
+- **07**: payload'dagi `source` va `page` manba sifatida ko'rsatiladi.
 
 ## Testlar
 

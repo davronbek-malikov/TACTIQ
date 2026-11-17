@@ -1,4 +1,4 @@
-# TACTIQ — AI-Powered Football Intelligence Platform
+# TACTIQ: AI-Powered Football Intelligence Platform
 
 **Ask football questions. Get evidence, not guesses.**
 
@@ -89,7 +89,7 @@ answer influences team selection, recruitment or a published article.
 
 *All capabilities below are **planned** unless marked otherwise.*
 
-**Multimodal conversational assistant** — designed primarily for coaches, not a text-only chatbot:
+**Multimodal conversational assistant**: designed primarily for coaches, not a text-only chatbot:
 
 | Modality                  | Planned capabilities                                                                                                                                       |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -97,7 +97,7 @@ answer influences team selection, recruitment or a published article.
 | **Image**           | Tactical board photos, formation diagrams and tactical screenshots; extract visual information where technically possible                                  |
 | **Video**           | Analyse match clips, identify relevant timestamps, link observations to events, players and teams when identification is reliable, generate clip summaries |
 | **Voice / audio**   | Speech-to-text questions, text-to-speech answers, hands-free conversation on the training ground                                                           |
-| **Documents**       | PDF, DOCX, TXT, Markdown tactical reports, scouting reports and match analyses — **ingestion implemented**                                          |
+| **Documents**       | PDF, DOCX, TXT, Markdown tactical reports, scouting reports and match analyses, **ingestion implemented**                                          |
 | **Structured data** | Match, player, team and event statistics, comparisons and calculated metrics                                                                               |
 
 **Intelligence:** multi-step investigation planning, automatic evidence retrieval, tool selection
@@ -221,17 +221,17 @@ flowchart TD
 
 **AI intelligence layer components**
 
-1. **LLM Engine** — understands questions, supports query planning and rewriting, helps the agent
+1. **LLM Engine**: understands questions, supports query planning and rewriting, helps the agent
    choose tools, interprets evidence, and generates grounded answers, summaries and reports.
    It is model-independent: Qwen, Ollama, vLLM or any OpenAI-compatible API can be plugged in.
-2. **RAG Engine** — semantic search, keyword search, hybrid retrieval, metadata filtering,
+2. **RAG Engine**: semantic search, keyword search, hybrid retrieval, metadata filtering,
    reranking and context construction over the Qdrant collection built by the indexing pipeline.
-3. **Football Analytics Engine** — SQL queries, match / player / team statistics, comparisons and
+3. **Football Analytics Engine**: SQL queries, match / player / team statistics, comparisons and
    calculations with Python and Pandas. Numbers come from here, never from the LLM's memory.
-4. **Knowledge and Entity Layer** — canonical IDs for teams, players, matches, competitions and
+4. **Knowledge and Entity Layer**: canonical IDs for teams, players, matches, competitions and
    events; relationships between entities; document references and provenance. This is what
    allows `match_id`, `team_id` and `player_id` in document metadata to be linked reliably.
-5. **Video Intelligence Engine (V2)** — video ingestion, frame extraction, YOLO detection,
+5. **Video Intelligence Engine (V2)**: video ingestion, frame extraction, YOLO detection,
    object tracking, spatial calibration and movement analysis, producing video-derived
    observations linked to match, player and event IDs.
 
@@ -252,7 +252,7 @@ the Investigation Agent can call. Each can use a different model or provider.
 
 ## 8. V1 and V2 scope
 
-### V1 — Evidence-based football intelligence (planned)
+### V1: Evidence-based football intelligence (planned)
 
 Football match and event data · player and team statistics · tactical documents and reports ·
 document ingestion (**implemented**) · RAG · Qdrant (**implemented for storage**) ·
@@ -260,7 +260,7 @@ PostgreSQL analytics · keyword and vector retrieval · hybrid search · reranki
 LLM-based grounded generation · AI Investigation Agent · multimodal conversational interface
 (text, voice, image, documents) · evaluation · FastAPI backend · Next.js frontend · deployment.
 
-### V2 — Video-based tactical intelligence (planned)
+### V2: Video-based tactical intelligence (planned)
 
 Video ingestion · frame extraction · player detection with YOLO · multi-object tracking ·
 spatial calibration · movement analysis · video-derived tactical observations · linking video
@@ -316,7 +316,7 @@ flowchart LR
 }
 ```
 
-**Known trade-off — chunk size vs. model limit.** `all-MiniLM-L6-v2` reads at most **256 tokens**
+**Known trade-off, chunk size vs. model limit.** `all-MiniLM-L6-v2` reads at most **256 tokens**
 per input. With the default chunk size of 500, tokens after position 256 are not represented in
 the vector (the full text is still stored in the payload). The pipeline prints a warning when this
 happens. Set `TACTIQ_CHUNK_SIZE=256` and `TACTIQ_CHUNK_OVERLAP=25` to avoid truncation, or switch to
@@ -390,7 +390,7 @@ terms, identifiers and library names stay in English.
 
 ## 12. Getting started
 
-> **Local app (UI):** see [UI/README.md](UI/README.md) — start Qdrant, then `python UI/backend/main.py`
+> **Local app (UI):** see [UI/README.md](UI/README.md): start Qdrant, then `python UI/backend/main.py`
 > and `npm run dev` in `UI/frontend`, open http://localhost:3000.
 
 ### 12.1 Install
@@ -492,24 +492,24 @@ sample documents.
 | Evidence aggregation and validation                                                                                  | Not implemented                  |
 | AI Investigation Agent and Conversation Engine                                                                       | Not implemented                  |
 | Multimodal input (voice, image)                                                                                      | Not implemented                  |
-| FastAPI backend (local, no auth) — documents, indexing jobs, investigate                                            | ✅ Implemented                   |
+| FastAPI backend (local, no auth), documents, indexing jobs, investigate                                            | ✅ Implemented                   |
 | Authentication                                                                                                       | Not implemented                  |
-| Next.js frontend — Overview, Investigate, Knowledge, Reports, Settings (Matches, Players, video: planned UI)        | ✅ Implemented                   |
+| Next.js frontend, Overview, Investigate, Knowledge, Reports, Settings (Matches, Players, video: planned UI)        | ✅ Implemented                   |
 | Evaluation                                                                                                           | Not implemented                  |
 | Video Intelligence (V2)                                                                                              | Not implemented                  |
 
 ## 15. Roadmap
 
-1. **Indexing** — document ingestion into Qdrant ✅
-2. **Retrieval & Generation** — semantic search, top-k, grounded prompt, Qwen / Groq / Gemini ✅
-3. **Search quality** — keyword search, hybrid retrieval with RRF, reranking
-4. **LLM Engine** — provider-independent interface, grounded answers with citations
-5. **Evaluation** — question sets, retrieval and answer-faithfulness metrics
-6. **Structured data** — PostgreSQL schema, football data ingestion, Analytics Engine
-7. **Knowledge and Entity Layer** — canonical IDs and links between documents and entities
-8. **Investigation Agent** — planning, tool selection, evidence sufficiency checks, conversation
-9. **Application** — FastAPI backend, Next.js frontend, voice and image input, deployment
-10. **V2 Video Intelligence** — frames, YOLO, tracking, spatial analysis, timestamped observations
+1. **Indexing**: document ingestion into Qdrant ✅
+2. **Retrieval & Generation**: semantic search, top-k, grounded prompt, Qwen / Groq / Gemini ✅
+3. **Search quality**: keyword search, hybrid retrieval with RRF, reranking
+4. **LLM Engine**: provider-independent interface, grounded answers with citations
+5. **Evaluation**: question sets, retrieval and answer-faithfulness metrics
+6. **Structured data**: PostgreSQL schema, football data ingestion, Analytics Engine
+7. **Knowledge and Entity Layer**: canonical IDs and links between documents and entities
+8. **Investigation Agent**: planning, tool selection, evidence sufficiency checks, conversation
+9. **Application**: FastAPI backend, Next.js frontend, voice and image input, deployment
+10. **V2 Video Intelligence**: frames, YOLO, tracking, spatial analysis, timestamped observations
 
 ## 16. Data sources and limitations
 
@@ -555,4 +555,4 @@ summary reports only measured counts.
 
 ## 19. License
 
-**TBD** — no license has been chosen yet. Until one is added, all rights are reserved by the author.
+**TBD**: no license has been chosen yet. Until one is added, all rights are reserved by the author.

@@ -2,8 +2,8 @@
 
 RAG'da ikkita pipeline bor:
 
-1. **Indexing** — foydalanuvchi savol berishidan **oldin** ishlaydi: hujjatlarni vector'larga aylantirib, Vector Database'ga saqlaydi. ← **shu papka**
-2. **Retrieval & Generation** — foydalanuvchi savol berganda ishlaydi (keyingi bosqich, hali yaratilmagan).
+1. **Indexing**: foydalanuvchi savol berishidan **oldin** ishlaydi: hujjatlarni vector'larga aylantirib, Vector Database'ga saqlaydi. ← **shu papka**
+2. **Retrieval & Generation**: foydalanuvchi savol berganda ishlaydi (keyingi bosqich, hali yaratilmagan).
 
 ```
 01 Documents  ->  02 Document Loading  ->  03 Chunking  ->  04 Embedding Model  ->  05 Vector Database
@@ -13,7 +13,7 @@ DOCX ...          o'qish                    qismlarga bo'lish  vector yaratish  
 
 ## Papka tuzilishi
 
-Har bir bosqich — alohida papka. Har birida: `README.md` (nazariya), `src/` (kod), `scripts/` (amaliyot), `tests/` (testlar).
+Har bir bosqich, alohida papka. Har birida: `README.md` (nazariya), `src/` (kod), `scripts/` (amaliyot), `tests/` (testlar).
 
 ```text
 Indexing/
@@ -83,7 +83,7 @@ pip install -r requirements.txt
 docker compose up -d qdrant        # 05-bosqich uchun. Dashboard: http://localhost:6333/dashboard
 ```
 
-Docker bo'lmasa: `.env` faylida `QDRANT_LOCAL_PATH=qdrant_local` — Qdrant diskdagi papkada ishlaydi.
+Docker bo'lmasa: `.env` faylida `QDRANT_LOCAL_PATH=qdrant_local`: Qdrant diskdagi papkada ishlaydi.
 
 ## Testlar
 
@@ -96,10 +96,10 @@ pytest Indexing/03_chunking                # faqat bitta bosqich testlari
 ## Mashqlar
 
 1. **01:** `my_documents/` ga o'z PDF yoki DOCX faylingizni qo'ying va unga `.meta.json` sidecar yozing.
-2. **02:** `my_documents/` ga `broken.pdf` nomli oddiy matn fayl yarating — pipeline to'xtamasdan xatoni hisobotda ko'rsatishini tekshiring.
+2. **02:** `my_documents/` ga `broken.pdf` nomli oddiy matn fayl yarating, pipeline to'xtamasdan xatoni hisobotda ko'rsatishini tekshiring.
 3. **03:** `--chunk-size 120 --overlap 20` va `--chunk-size 500 --overlap 50` natijalarini solishtiring.
 4. **04:** Nima uchun `chunk_size=500 > max_seq_length=256` ogohlantirishi chiqadi? `.env`da `TACTIQ_CHUNK_SIZE=256`, `TACTIQ_CHUNK_OVERLAP=25`, `QDRANT_COLLECTION=tactiq_256` qilib qayta ishga tushiring.
-5. **05:** `step1_run_vector_database.py` ni ikki marta ishga tushiring — point'lar soni o'zgarmasligi kerak. Nima uchun?
+5. **05:** `step1_run_vector_database.py` ni ikki marta ishga tushiring, point'lar soni o'zgarmasligi kerak. Nima uchun?
 
 ## Keyingi pipeline bilan bog'liqlik
 
