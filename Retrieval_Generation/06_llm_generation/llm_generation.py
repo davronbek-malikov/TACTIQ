@@ -15,11 +15,11 @@ import os
 import sys
 from pathlib import Path
 
-from openai import OpenAI
+from openai import OpenAI  # bitta client — Qwen (Ollama), Groq, Gemini (pip install openai)
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # Retrieval_Generation/
 import rag_paths  # noqa: E402,F401
-import config.settings  # noqa: E402,F401  — .env faylini yuklaydi (API kalitlar shu yerda)
+from config.settings import is_offline  # noqa: E402  — .env faylini yuklaydi (API kalitlar shu yerda)
 
 LLM_PROVIDERS = {
     "qwen": {
@@ -52,6 +52,8 @@ def get_model_name(llm: str) -> str:
 def generate_answer(messages: list[dict], llm: str = "qwen") -> str:
     """Xabarlarni tanlangan LLM'ga yuboradi va javob matnini qaytaradi."""
     provider = LLM_PROVIDERS[llm]
+    if is_offline() and provider["key_env"]:  # cloud LLM = internet kerak
+        raise RuntimeError(f"Offline rejim (TACTIQ_OFFLINE=1): '{llm}' cloud LLM. Faqat 'qwen' ishlaydi.")
 
     api_key = "ollama"  # Ollama uchun istalgan matn
     if provider["key_env"]:
@@ -76,5 +78,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     test_messages = [{"role": "user", "content": "In one sentence: what is counterpressing in football?"}]
+    print(f"Rejim: {'OFFLINE (internetsiz)' if is_offline() else 'ONLINE'}")
     print(f"LLM: {args.llm} ({get_model_name(args.llm)})")
     print(generate_answer(test_messages, args.llm))

@@ -5,9 +5,9 @@ Bosqich funksiyalari Retrieval_Generation papkasidan olinadi (qayta yozilmagan).
 UI'dagi progress faqat HAQIQATDA bajarilgan bosqichlarni ko'rsatadi.
 """
 
-import time
+import time  # time.perf_counter() — har bir bosqich vaqti (ms)
 
-from qdrant_client.models import FieldCondition, Filter, MatchAny
+from qdrant_client.models import FieldCondition, Filter, MatchAny  # UI filter: "topic IN [...]"
 
 from user_question import prepare_question                 # 01
 from query_embedding import embed_question                  # 02

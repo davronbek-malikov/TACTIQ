@@ -4,13 +4,14 @@ documents — 01_documents papkasidagi fayllar bilan ishlash: ro'yxat, tafsilot,
 Ikki manba:
     sample_docs  — dars uchun namunalar (faqat o'qish)
     my_documents — foydalanuvchi yuklagan haqiqiy hujjatlar (git'ga tushmaydi)
+    football_data — ochiq futbol datasidan yasalgan hisobotlar (faqat o'qish)
 
 Fayllarni o'qish va metadata yasash — Indexing'dagi funksiyalar bilan (qayta yozilmagan).
 """
 
 import json
 import re
-from collections import Counter
+from collections import Counter  # har bir document_id uchun chunk soni
 from pathlib import Path
 
 from document_loading import (
@@ -23,12 +24,16 @@ from document_loading import (
     make_document_id,
     read_sidecar_metadata,
 )
-from qdrant_client.models import FieldCondition, Filter, MatchValue
+from qdrant_client.models import FieldCondition, Filter, MatchValue  # "document_id = ..." filter
 
 import core
 
 DOCUMENTS_DIR = core.PROJECT_ROOT / "Indexing" / "01_documents"
-SOURCES = {"sample_docs": DOCUMENTS_DIR / "sample_docs", "my_documents": DOCUMENTS_DIR / "my_documents"}
+SOURCES = {
+    "sample_docs": DOCUMENTS_DIR / "sample_docs",
+    "my_documents": DOCUMENTS_DIR / "my_documents",
+    "football_data": DOCUMENTS_DIR / "football_data",   # StatsBomb, Wyscout, SkillCorner (data_sources/ yasaydi)
+}
 EDITABLE_SOURCES = {"my_documents"}         # namunalar o'zgartirilmaydi
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024         # 20 MB
 SAFE_NAME = re.compile(r"^[\w\-. ()]+$")    # harf, raqam, _ - . bo'sh joy, qavslar

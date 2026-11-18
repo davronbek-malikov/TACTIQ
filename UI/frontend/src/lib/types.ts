@@ -1,8 +1,9 @@
 // API kontraktlari — UI/backend/schemas.py va main.py javoblari bilan bir xil.
 
-export type SourceName = "sample_docs" | "my_documents";
+export type SourceName = "sample_docs" | "my_documents" | "football_data";
 export type LlmId = "qwen" | "groq" | "gemini";
 export type AnswerMode = "rag" | "llm_only"; // rag — hujjatlar asosida; llm_only — hujjatsiz (taqqoslash)
+export type ComposerMode = AnswerMode | "compare"; // compare — bitta savol ikkala rejimda, yonma-yon
 
 export interface QdrantStatus {
   mode: "server" | "local";
@@ -42,6 +43,7 @@ export interface IndexingJob {
 
 export interface SystemInfo {
   version: string;
+  offline: boolean; // TACTIQ_OFFLINE=1 — internetsiz rejim (faqat Qwen)
   qdrant: QdrantStatus;
   collection: { name: string; exists: boolean; points: number | null; vector_size: number | null };
   indexed_documents: number;

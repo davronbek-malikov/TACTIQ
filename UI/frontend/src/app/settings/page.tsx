@@ -22,6 +22,7 @@ export default function SettingsPage() {
         <CardHeader title="Local services" />
         {system.loading && !info ? <LoadingState /> : (
           <Rows>
+            <Row label="Network mode" value={info ? <Badge tone={info.offline ? "success" : "info"}>{info.offline ? "Offline · on-premise (Qwen only)" : "Online · cloud LLMs allowed"}</Badge> : "—"} />
             <Row label="FastAPI backend" value={<StatusDot ok={info ? true : system.error ? false : null} label={API_URL} />} />
             <Row label="Qdrant" value={info ? <StatusDot ok={info.qdrant.connected} label={info.qdrant.connected ? "Connected" : "Unreachable"} /> : "—"} />
             <Row label="Qdrant mode" value={info ? `${info.qdrant.mode} · ${info.qdrant.location}` : "—"} />
@@ -58,6 +59,7 @@ export default function SettingsPage() {
         <Rows>
           <Row label="Sample documents" value={info?.document_dirs.sample_docs ?? "—"} mono />
           <Row label="My documents" value={info?.document_dirs.my_documents ?? "—"} mono />
+          <Row label="Football data" value={info?.document_dirs.football_data ?? "—"} mono />
           <Row label="Vector storage" value={info ? (info.qdrant.mode === "local" ? info.qdrant.location : "Docker volume qdrant_storage") : "—"} mono />
         </Rows>
       </Card>

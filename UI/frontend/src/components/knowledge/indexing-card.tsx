@@ -13,6 +13,7 @@ import type { IndexingJob, SourceName } from "@/lib/types";
 const SOURCES: { id: SourceName; label: string; description: string }[] = [
   { id: "my_documents", label: "My documents", description: "Your uploaded documents" },
   { id: "sample_docs", label: "Sample documents", description: "Educational samples (read-only)" },
+  { id: "football_data", label: "Football data", description: "StatsBomb, Wyscout and SkillCorner open data (read-only)" },
 ];
 
 // Mavjud Indexing pipeline'ni backend orqali ishga tushiradi va natijasini kuzatadi.

@@ -3,7 +3,7 @@
 RAG'da ikkita pipeline bor:
 
 1. **Indexing**: foydalanuvchi savol berishidan **oldin** ishlaydi: hujjatlarni vector'larga aylantirib, Vector Database'ga saqlaydi. ← **shu papka**
-2. **Retrieval & Generation**: foydalanuvchi savol berganda ishlaydi (keyingi bosqich, hali yaratilmagan).
+2. **Retrieval & Generation**: foydalanuvchi savol berganda ishlaydi → [Retrieval_Generation/](../Retrieval_Generation/README.md).
 
 ```
 01 Documents  ->  02 Document Loading  ->  03 Chunking  ->  04 Embedding Model  ->  05 Vector Database
@@ -55,7 +55,22 @@ Indexing/
 ```
 
 Loyiha ildizidagi umumiy fayllar (ikkala pipeline ham ishlatadi):
-`config/settings.py`, `.env`, `docker-compose.yml`, `requirements.txt`, `pytest.ini`.
+[config/settings.py](../config/README.md), `.env`, `docker-compose.yml`, `requirements.txt`, `pytest.ini`.
+
+## Kutubxonalar
+
+| Kutubxona (`pip`) | Bosqich | Nima uchun |
+|---|---|---|
+| `pymupdf` | 02 | PDF sahifalarini o'qish |
+| `python-docx` | 02 | DOCX paragraph va jadvallarini o'qish |
+| `transformers` | 03 | tokenizer: matn → token'lar |
+| `sentence-transformers` | 04 | embedding model: matn → 384 ta son (`torch` bilan o'rnatiladi) |
+| `numpy` | 04, 05 | vector'lar bilan hisob-kitob |
+| `qdrant-client` | 05 | Qdrant'ga yozish va o'qish |
+| `python-dotenv` | config | `.env` faylini o'qish |
+| `pytest` | tests | testlar |
+
+Python'ning o'zida bor (o'rnatish shart emas): `pathlib`, `json`, `uuid`, `re`, `unicodedata`, `dataclasses`, `argparse`.
 
 ## Darsda: nazariya + amaliyot parallel
 
@@ -84,6 +99,7 @@ docker compose up -d qdrant        # 05-bosqich uchun. Dashboard: http://localho
 ```
 
 Docker bo'lmasa: `.env` faylida `QDRANT_LOCAL_PATH=qdrant_local`: Qdrant diskdagi papkada ishlaydi.
+Batafsil: [qdrant_local/README.md](../qdrant_local/README.md).
 
 ## Testlar
 

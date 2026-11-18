@@ -16,6 +16,21 @@
 
 Model: [`sentence-transformers/all-MiniLM-L6-v2`](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) (Hugging Face, ~90 MB, birinchi ishga tushirishda yuklanadi).
 
+## Fayllar
+
+| Fayl | Nima qiladi |
+|---|---|
+| `src/embedding_model/embedder.py` | `EmbeddingModel`: modelni yuklash, `dimension`, `embed()`, `validate()` |
+| `scripts/run_embedding.py` | vector shakli, norm va ma'no yaqinligini ko'rsatadi |
+| `tests/test_embeddings.py` | shakl (n, 384), norm = 1, o'xshash matnlar yaqin |
+
+## Kutubxonalar
+
+```python
+from sentence_transformers import SentenceTransformer  # embedding model (pip install sentence-transformers; torch bilan keladi)
+import numpy as np                                     # vector'lar: shape, norm, vstack, dot product (@)
+```
+
 ## Amaliyot
 
 ```bash

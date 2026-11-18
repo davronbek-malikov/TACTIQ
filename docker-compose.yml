@@ -17,6 +17,7 @@ services:
       # Local development only: no API key. For any shared or cloud deployment,
       # set QDRANT__SERVICE__API_KEY here and QDRANT_API_KEY in .env.
       QDRANT__LOG_LEVEL: INFO
+      QDRANT__TELEMETRY_DISABLED: "true"   # on-premise: anonim statistika yuborilmaydi
 
 volumes:
   qdrant_storage:

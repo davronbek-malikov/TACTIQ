@@ -2,11 +2,11 @@
 schemas — API kontraktlari (Pydantic). Frontend'dagi `src/lib/types.ts` bilan bir xil tuzilma.
 """
 
-from typing import Literal, Optional
+from typing import Literal, Optional  # Literal["qwen", "groq", "gemini"] — faqat shu qiymatlar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field  # so'rov/javob shaklini tekshiradi (fastapi bilan keladi)
 
-SourceName = Literal["sample_docs", "my_documents"]
+SourceName = Literal["sample_docs", "my_documents", "football_data"]
 LlmName = Literal["qwen", "groq", "gemini"]
 Mode = Literal["rag", "llm_only"]  # rag — hujjatlar asosida; llm_only — hujjatsiz (taqqoslash uchun)
 
@@ -30,7 +30,7 @@ class InvestigateRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
     llm: LlmName = "qwen"
     mode: Mode = "rag"
-    k: int = Field(default=3, ge=1, le=10)
+    k: int = Field(default=5, ge=1, le=10)  # 5 — futbol datasida bitta o'yin bir necha chunk'ga bo'linadi
     collection: Optional[str] = None
     document_ids: list[str] = []   # bo'sh — barcha hujjatlar
     file_types: list[str] = []

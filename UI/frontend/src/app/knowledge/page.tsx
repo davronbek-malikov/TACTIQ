@@ -70,7 +70,7 @@ export default function KnowledgePage() {
                       <td className="px-4 py-3">
                         <Badge tone={row.indexed ? "success" : "warning"}>{row.indexed ? "Indexed" : "Not indexed"}</Badge>
                       </td>
-                      <td className="px-4 py-3 text-muted">{row.source === "sample_docs" ? "Sample" : "Mine"}</td>
+                      <td className="px-4 py-3 text-muted">{{ sample_docs: "Sample", my_documents: "Mine", football_data: "Football data" }[row.source]}</td>
                     </tr>
                   ))}
                 </tbody>

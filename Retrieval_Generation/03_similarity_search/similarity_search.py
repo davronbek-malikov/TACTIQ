@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # Retrieval_Generation/
 import rag_paths  # noqa: E402,F401
 
-from qdrant_client import QdrantClient  # noqa: E402
+from qdrant_client import QdrantClient  # noqa: E402  — Qdrant client (pip install qdrant-client)
 
 
 def similarity_search(

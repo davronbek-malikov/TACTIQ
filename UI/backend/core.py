@@ -5,9 +5,9 @@ Model va ulanish bir marta yaratiladi va barcha so'rovlar uchun qayta ishlatilad
 Qdrant local rejimida (QDRANT_LOCAL_PATH) faqat bitta ulanish bo'lishi mumkin — shuning uchun hammasi shu yerda.
 """
 
-import contextlib
+import contextlib  # nullcontext — server rejimida "bo'sh" qulf
 import sys
-import threading
+import threading   # Lock — bir vaqtda bitta Qdrant/model amali
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent

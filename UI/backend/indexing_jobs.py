@@ -6,8 +6,8 @@ Bir vaqtda faqat bitta job. Tarix runtime/indexing_history.json da saqlanadi.
 """
 
 import json
-import threading
-import uuid
+import threading  # indexing fonda (alohida thread) ishlaydi
+import uuid       # job id
 from dataclasses import asdict
 from datetime import datetime, timezone
 

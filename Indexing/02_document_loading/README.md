@@ -19,6 +19,30 @@ Bu bosqich uchta kichik qadamdan iborat (`src/document_loading/` ichida):
 - **Metadata filtering:** "faqat `topic = high_pressing` hujjatlaridan qidir".
 - **Provenance:** har bir dalil qayerdan kelganini bilish.
 
+## Fayllar
+
+| Fayl | Nima qiladi |
+|---|---|
+| `src/document_loading/__init__.py` | qisqa import: `from document_loading import load_directory` |
+| `src/.../step0_document.py` | `Document(text, metadata)` |
+| `src/.../step1_load.py` | `load_directory()` → `LoadResult` (documents, failed_files) |
+| `src/.../step2_metadata.py` | `attach_metadata()`: document_id + sidecar |
+| `src/.../step3_cleaning.py` | `clean_document()`: matnni tozalaydi |
+| `scripts/run_document_loading.py` | 2.1 → 2.3 natijasini ekranga chiqaradi |
+| `tests/test_step1..3_*.py` | har bir qadam testi |
+
+## Kutubxonalar
+
+```python
+import pymupdf                          # PDF: har sahifa matni (pip install pymupdf)
+from docx import Document as DocxFile   # DOCX: paragraph + jadval (pip install python-docx)
+import json                             # sidecar (.meta.json) o'qish
+import uuid                             # uuid5: har safar bir xil document_id
+import re, unicodedata                  # tozalash: regex + unicode normalizatsiya
+from dataclasses import dataclass       # Document, LoadResult: ma'lumot class'lari
+from pathlib import Path                # fayl yo'llari
+```
+
 ## Amaliyot
 
 ```bash

@@ -11,7 +11,7 @@ Keyingi bosqich: 06 — LLM Generation
 SYSTEM_PROMPT = (
     "You are TACTIQ, a football analysis assistant. "
     "Answer ONLY using the context. If the context does not contain the answer, say that you don't know. "
-    "Cite the sources you use as [1], [2]. Answer in the same language as the question."
+    "Cite the sources you use as [1], [2]. Answer in the language the question is written in (an English question gets an English answer)."
 )
 
 
@@ -27,7 +27,9 @@ def build_messages(question: str, chunks: list) -> list[dict]:
     """LLM'ga yuboriladigan xabarlar: system (qoidalar) + user (kontekst + savol)."""
     return [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": f"Context:\n{build_context(chunks)}\n\nQuestion: {question}"},
+        # til eslatmasi savol yonida: kontekstdagi "Messi Cuccittini" kabi ismlar model tilini chalg'itmasin
+        {"role": "user", "content": f"Context:\n{build_context(chunks)}\n\n"
+                                    f"Reply in the language of the question below, not of the context.\nQuestion: {question}"},
     ]
 
 

@@ -17,7 +17,33 @@
 - **upsert** = update + insert: shu ID bo'lsa yangilaydi, bo'lmasa qo'shadi. Pipeline'ni 10 marta ishga tushirsangiz ham nusxalar ko'paymaydi.
 - **Payload index**: `topic`, `source` kabi maydonlar bo'yicha filter'ni tezlashtiradi.
 
+## Fayllar
+
+| Fayl | Nima qiladi |
+|---|---|
+| `src/vector_database/qdrant_store.py` | `create_qdrant_client()` (server yoki local), `build_payload()`, `QdrantStore` |
+| `scripts/step1_run_vector_database.py` | butun pipeline 02 → 05 + bitta saqlangan point |
+| `scripts/step2_inspect_collection.py` | collection: o'lcham, point soni, payload namunalari |
+| `tests/test_qdrant_store.py` | payload, upsert (dublikatsiz), o'lcham tekshiruvi |
+
+`QdrantStore` metodlari: `ensure_collection()` → `upsert_chunks()` → `count()` / `peek()`; `delete_document()`.
+
+## Kutubxonalar
+
+```python
+from qdrant_client import QdrantClient          # Qdrant'ga ulanish (pip install qdrant-client)
+from qdrant_client.models import (
+    VectorParams, Distance,                     # collection: size=384, distance=COSINE
+    PointStruct,                                # point = id + vector + payload
+    Filter, FieldCondition, MatchValue,         # "document_id = ..." sharti
+)
+import numpy as np                              # vector -> list (.tolist())
+from collections import defaultdict             # chunk'larni document_id bo'yicha guruhlash
+```
+
 ## Amaliyot
+
+Docker ishlamasa: `.env` da `QDRANT_LOCAL_PATH=qdrant_local` ([qdrant_local/README.md](../../qdrant_local/README.md)).
 
 ```bash
 docker compose up -d qdrant                                          # avval Qdrant

@@ -33,7 +33,11 @@ Thumbs.db
 Indexing/01_documents/my_documents/*
 !Indexing/01_documents/my_documents/.gitkeep
 Indexing/03_chunking/output/
-qdrant_local/
+# Football data: raw downloads (~1.3 GB) and generated reports — rebuild with data_sources/*.py
+Indexing/01_documents/data_sources/.cache/
+Indexing/01_documents/football_data/
+qdrant_local/*
+!qdrant_local/README.md
 .pytest_cache/
 
 # TACTIQ UI: backend runtime state (indexing history)

@@ -9,11 +9,11 @@ Brauzer (Next.js, :3000)  ->  Backend (FastAPI, :8000)  ->  Indexing + Retrieval
 Brauzer Qdrant'ga to'g'ridan-to'g'ri ulanmaydi, hammasi backend orqali. Backend yangi pipeline yozmaydi:
 `Indexing/indexing_pipeline.py` va `Retrieval_Generation` bosqich funksiyalarini **import qiladi**.
 
-## Tuzilma
+## Tuzilma (har bir papkada README bor)
 
 ```text
 UI/
-├── backend/                 # FastAPI (Python)
+├── backend/                 # FastAPI (Python)          -> backend/README.md
 │   ├── main.py              # API endpoint'lar (ishga tushirish fayli)
 │   ├── core.py              # umumiy resurslar: sozlamalar, embedding model, bitta Qdrant ulanishi
 │   ├── schemas.py           # API kontraktlari (Pydantic)
@@ -21,11 +21,25 @@ UI/
 │   ├── indexing_jobs.py     # Indexing pipeline'ni fonda ishga tushirish
 │   ├── investigate.py       # Retrieval & Generation'ning 7 bosqichi (vaqti bilan)
 │   └── tests/test_api.py
-└── frontend/                # Next.js + TypeScript + Tailwind
+└── frontend/                # Next.js + TypeScript + Tailwind   -> frontend/README.md
     └── src/
-        ├── app/             # 7 sahifa: Overview, Investigate, Knowledge, Matches, Players, Reports, Settings
-        ├── components/      # ui/, layout/, investigate/, knowledge/, evidence/, video/
-        └── lib/             # api.ts (backend bilan aloqa), types.ts (kontraktlar)
+        ├── app/             # 7 sahifa                   -> src/app/README.md
+        ├── components/      # ui/, layout/, investigate/ -> src/components/README.md
+        └── lib/             # api.ts, types.ts           -> src/lib/README.md
+```
+
+O'qish tartibi: [backend](backend/README.md) → [frontend](frontend/README.md) → [src/app](frontend/src/app/README.md) → [src/components](frontend/src/components/README.md) → [src/lib](frontend/src/lib/README.md).
+
+## Bitta savolning yo'li (to'liq RAG)
+
+```
+1. Brauzer: Investigate sahifasida savol yoziladi           frontend/src/app/investigate/page.tsx
+2. api.investigate() -> POST /api/investigate                frontend/src/lib/api.ts
+3. FastAPI endpoint                                          backend/main.py
+4. 7 bosqich, har birining vaqti                             backend/investigate.py
+   01 prepare_question -> 02 embed_question -> 03 similarity_search -> 04 select_top_k
+   -> 05 build_messages -> 06 generate_answer -> 07 javob + evidence   (Retrieval_Generation/)
+5. JSON javob -> TurnView (javob, [1]) + EvidencePanel (chunk'lar)
 ```
 
 ## Ishga tushirish (3 ta terminal, loyiha ildizidan)
@@ -37,6 +51,8 @@ docker compose up -d qdrant
 ```
 
 Docker ishlamasa: `.env` faylida `QDRANT_LOCAL_PATH=qdrant_local`: Qdrant diskdagi papkada ishlaydi (Docker kerak emas).
+Diqqat: local rejimda backend ishlab turganda `python Indexing/...` skriptlari papkani ocha olmaydi:
+indexing'ni UI'dagi **Knowledge → Index** tugmasi bilan qiling ([qdrant_local](../qdrant_local/README.md)).
 
 **2. Backend** (`.venv` yoqilgan bo'lsin):
 
@@ -57,6 +73,19 @@ Brauzerda **http://localhost:3000** ni oching → **Knowledge** → *Sample docu
 
 **LLM** (kamida bittasi, `.env` da): `GROQ_API_KEY`, `GEMINI_API_KEY` yoki Ollama (`ollama pull qwen2.5:1.5b`).
 LLM sozlanmagan bo'lsa ham dalillar (evidence) topiladi, faqat javob o'rniga aniq xato ko'rsatiladi.
+
+## Internetli / internetsiz rejim
+
+| | Online (`TACTIQ_OFFLINE=0`) | Offline (`TACTIQ_OFFLINE=1`) |
+|---|---|---|
+| LLM | Qwen, Groq, Gemini | faqat **Qwen** (Ollama) |
+| UI tepa panel | `Online` belgisi | `Offline` belgisi |
+| Settings sahifasi | *Online · cloud LLMs allowed* | *Offline · on-premise (Qwen only)* |
+
+Almashtirish: `.env` da qiymatni o'zgartiring → backend'ni qayta ishga tushiring (Ctrl+C, `python UI/backend/main.py`).
+Tayyorlikni tekshirish: `python check_mode.py` (loyiha ildizidan; Qdrant'ni ochmaydi, shuning uchun backend ishlab turganda ham ishlaydi).
+
+Offline uchun bir martalik tayyorgarlik (internet bilan): [Ollama](https://ollama.com) o'rnatish → `ollama pull qwen2.5:1.5b`.
 
 ## Backend endpoint'lari
 

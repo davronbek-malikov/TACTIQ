@@ -13,6 +13,7 @@ import pytest
 TMP = Path(tempfile.mkdtemp(prefix="tactiq_api_test_"))
 os.environ["QDRANT_LOCAL_PATH"] = str(TMP / "qdrant")
 os.environ["QDRANT_COLLECTION"] = "api_test"
+os.environ["TACTIQ_CHUNK_SIZE"], os.environ["TACTIQ_CHUNK_OVERLAP"] = "500", "50"  # kutilgan chunk soni .env'ga bog'liq bo'lmasin
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # UI/backend
 
 from fastapi.testclient import TestClient  # noqa: E402

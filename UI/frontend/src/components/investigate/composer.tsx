@@ -5,7 +5,7 @@ import { useState, type KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/fields";
 import { cn } from "@/lib/format";
-import type { AnswerMode, LlmId, LlmInfo } from "@/lib/types";
+import type { ComposerMode, LlmId, LlmInfo } from "@/lib/types";
 
 const LLM_LABELS: Record<LlmId, string> = {
   qwen: "Qwen · local (offline)",
@@ -34,8 +34,8 @@ export function Composer({
   llms: LlmInfo[];
   llm: LlmId;
   onLlmChange: (llm: LlmId) => void;
-  mode: AnswerMode;
-  onModeChange: (mode: AnswerMode) => void;
+  mode: ComposerMode;
+  onModeChange: (mode: ComposerMode) => void;
   onSubmit: (question: string) => void;
   busy: boolean;
   initialQuestion?: string;
@@ -79,11 +79,12 @@ export function Composer({
           <Select
             aria-label="Answer mode"
             value={mode}
-            onChange={(e) => onModeChange(e.target.value as AnswerMode)}
+            onChange={(e) => onModeChange(e.target.value as ComposerMode)}
             className="h-9 min-w-0 flex-1 text-xs sm:w-auto sm:flex-none sm:min-w-44"
           >
             <option value="rag">RAG — from documents</option>
             <option value="llm_only">LLM only — no documents</option>
+            <option value="compare">Compare — LLM only vs RAG</option>
           </Select>
           <Select
             aria-label="LLM"

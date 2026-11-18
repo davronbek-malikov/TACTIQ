@@ -134,6 +134,11 @@ function ConnectionStatus() {
     <Link href="/settings" className="flex items-center gap-2 rounded-lg border border-line bg-card px-3 py-1.5 text-xs font-medium text-ink hover:bg-subtle">
       <span className={cn("size-2 rounded-full", ok === null ? "bg-muted/40" : ok ? "bg-primary" : "bg-danger")} aria-hidden />
       <span className="hidden sm:inline">{label}</span>
+      {system && (
+        <span className={cn("rounded px-1.5 py-0.5", system.offline ? "bg-primary-soft text-primary" : "bg-info-soft text-info")}>
+          {system.offline ? "Offline" : "Online"}
+        </span>
+      )}
     </Link>
   );
 }

@@ -75,12 +75,38 @@ def test_generate_answer_calls_openai_compatible_api(monkeypatch):
             return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="answer [1]"))])
 
     monkeypatch.setattr(llm_generation, "OpenAI", FakeOpenAI)
+    monkeypatch.setenv("TACTIQ_OFFLINE", "0")  # .env'da offline yoqilgan bo'lsa ham test online rejimda
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")
     monkeypatch.setenv("GEMINI_MODEL", "my-gemini")
 
     assert llm_generation.generate_answer([{"role": "user", "content": "hi"}], "gemini") == "answer [1]"
     assert calls == {"base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
                      "api_key": "test-key", "model": "my-gemini"}
+
+
+def test_offline_mode_blocks_cloud_llms(monkeypatch):
+    monkeypatch.setenv("TACTIQ_OFFLINE", "1")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    with pytest.raises(RuntimeError, match="Offline"):
+        llm_generation.generate_answer([{"role": "user", "content": "hi"}], "gemini")
+
+
+def test_offline_mode_allows_local_qwen(monkeypatch):
+    monkeypatch.setenv("TACTIQ_OFFLINE", "1")
+    fake = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(
+        create=lambda **_: SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="local"))]))))
+    monkeypatch.setattr(llm_generation, "OpenAI", lambda base_url, api_key: fake)
+    assert llm_generation.generate_answer([{"role": "user", "content": "hi"}], "qwen") == "local"
+
+
+def test_offline_mode_rejects_qdrant_cloud(monkeypatch):
+    from config.settings import get_settings
+
+    monkeypatch.setenv("TACTIQ_OFFLINE", "1")
+    monkeypatch.setenv("QDRANT_URL", "https://xxxx.cloud.qdrant.io:6333")
+    monkeypatch.delenv("QDRANT_LOCAL_PATH", raising=False)
+    with pytest.raises(ValueError, match="Offline"):
+        get_settings()
 
 
 # ---------- 07 Answer + Sources ----------

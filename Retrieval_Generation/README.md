@@ -22,6 +22,26 @@ Har bir papkada: `README.md` (nazariya) + bitta kod fayli. Kod faylini to'g'rida
 | [06 LLM Generation](06_llm_generation/README.md) | `llm_generation.py` | qwen / groq / gemini javobi |
 | [07 Answer + Sources](07_answer_sources/README.md) | `answer_sources.py` | javob + manbalar |
 
+Papka ildizidagi fayllar:
+
+| Fayl | Nima qiladi |
+|---|---|
+| `rag_pipeline.py` | `RagPipeline.ask()`: 01 → 07 ni ketma-ket chaqiradi (model va Qdrant bir marta ochiladi) |
+| `rag_paths.py` | import yo'llari: `config/`, Indexing paketlari va 0X_ papkalar |
+| `conftest.py` | pytest uchun `rag_paths` ni yuklaydi |
+| `tests/test_rag_steps.py` | har bir bosqich + butun pipeline testi (LLM soxta, Qdrant local) |
+
+## Kutubxonalar
+
+| Kutubxona (`pip`) | Bosqich | Nima uchun |
+|---|---|---|
+| `sentence-transformers` | 02 | savol → vector (Indexing'dagi `EmbeddingModel` orqali) |
+| `qdrant-client` | 03 | `query_points()`: vector qidiruv |
+| `openai` | 06 | Qwen / Groq / Gemini: bitta client |
+| `python-dotenv` | 06 | `.env` dagi API kalitlar |
+
+Yangi kutubxona faqat bitta: `openai`. Qolganlari Indexing'dan keladi.
+
 Ishga tushirish (loyiha ildizidan):
 ```bash
 python Retrieval_Generation/<papka>/<fayl>.py
@@ -31,6 +51,7 @@ python Retrieval_Generation/rag_pipeline.py --llm groq --question "What is a low
 ## Tayyorgarlik
 
 1. **Indexing bajarilgan bo'lishi kerak:** `python Indexing/indexing_pipeline.py` (Qdrant'da chunk'lar bo'lsin).
+   Qdrant rejimi Indexing'dagi bilan bir xil bo'lsin: [qdrant_local/README.md](../qdrant_local/README.md).
 2. **LLM:** kamida bittasini sozlang (`.env.example` → `.env`):
    - **qwen:** [Ollama](https://ollama.com) o'rnating, so'ng `ollama pull qwen2.5:1.5b`
    - **groq:** `GROQ_API_KEY=`: kalit: https://console.groq.com/keys

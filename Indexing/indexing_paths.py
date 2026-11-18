@@ -17,3 +17,5 @@ SRC_DIRS = sorted(INDEXING_DIR.glob("*/src"))     # 02, 03, 04, 05 bosqichlarnin
 for folder in [PROJECT_ROOT, INDEXING_DIR, *SRC_DIRS]:
     if str(folder) not in sys.path:
         sys.path.insert(0, str(folder))
+
+import config.settings  # noqa: E402,F401  — .env + offline rejim, transformers'dan OLDIN yuklansin

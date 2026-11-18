@@ -27,6 +27,23 @@ step = chunk_size - overlap = 450
 
 Har bir chunk: `chunk_id` (barqaror UUID), `document_id`, `text` (asl matndan aynan kesilgan), `metadata` (+ `chunk_index`, `token_count`).
 
+## Fayllar
+
+| Fayl | Nima qiladi |
+|---|---|
+| `src/chunking/text_splitter.py` | `Chunk`, `make_token_windows()`, `make_chunk_id()`, `TokenTextSplitter` |
+| `scripts/run_chunking.py` | window'lar, token'lar, chunk'lar va overlap'ni ko'rsatadi |
+| `tests/test_chunking.py` | chunk o'lchami, overlap, barqaror ID testlari |
+| `output/chunks.jsonl` | pipeline yozadi: har qatorda bitta chunk (git'ga tushmaydi) |
+
+## Kutubxonalar
+
+```python
+from transformers import AutoTokenizer   # model nomi bo'yicha tokenizer (pip install transformers)
+import uuid                              # chunk_id = uuid5(document_id + page + chunk_index)
+from typing import Iterator              # generator turi (yield)
+```
+
 ## Amaliyot
 
 ```bash

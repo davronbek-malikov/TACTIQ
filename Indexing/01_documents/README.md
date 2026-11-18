@@ -16,9 +16,21 @@
 |---|---|
 | `sample_docs/` | 5 ta namunaviy hujjat: high pressing (DOCX), low block (TXT), counterpressing (PDF, 2 sahifa), build-up play (MD), defensive transitions (MD). **Ta'limiy namuna**: haqiqiy o'yin statistikasi yo'q. |
 | `my_documents/` | O'zingizning fayllaringiz. Git'ga tushmaydi. |
+| `football_data/` | **Haqiqiy futbol datasi**: StatsBomb, Wyscout, SkillCorner'dan yasalgan ~1950 ta hisobot. `data_sources/*.py` yasaydi, git'ga tushmaydi. |
+| `data_sources/` | ochiq datani yuklab, `.md` hisobotga aylantiradigan skriptlar → [README](data_sources/README.md) |
 
 `low_block.txt` ataylab "iflos" yozilgan (ortiqcha bo'sh joylar), 02-bosqichdagi tozalashni ko'rsatish uchun.
 `build_up_play.md` eng uzun hujjat, 03-bosqichda bir nechta chunk'ga bo'linadi.
+
+## Fayllar
+
+| Fayl | Nima |
+|---|---|
+| `sample_docs/*.pdf, *.docx, *.txt, *.md` | hujjatlarning o'zi |
+| `sample_docs/<fayl>.meta.json` | sidecar: odam yozgan metadata |
+| `my_documents/.gitkeep` | bo'sh papka git'da qolishi uchun |
+
+`sample_docs` va `my_documents` da kod yo'q: fayllarni 02-bosqich o'qiydi. `data_sources/` da esa hujjat **yasaydigan** kod bor.
 
 ## Amaliyot
 

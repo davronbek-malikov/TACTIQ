@@ -6,14 +6,15 @@ Brauzer Qdrant'ga to'g'ridan-to'g'ri ulanmaydi: hammasi shu API orqali.
     python UI/backend/main.py            # http://localhost:8000  (hujjatlar: http://localhost:8000/docs)
 """
 
-import os
-import urllib.request
+import os                # os.getenv — port, CORS manzillari, API kalitlar bormi
+import urllib.request    # Ollama ishlayaptimi — oddiy HTTP so'rov
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile  # web API (pip install fastapi)
+from fastapi.middleware.cors import CORSMiddleware  # brauzer :3000 dan :8000 ga so'rov yubora olsin
 
 import core
 import documents
+from config.settings import is_offline
 import indexing_jobs
 import investigate
 from llm_generation import LLM_PROVIDERS, get_model_name
@@ -54,6 +55,7 @@ def system():
     history = indexing_jobs.load_history()
     return {
         "version": core.APP_VERSION,
+        "offline": is_offline(),  # TACTIQ_OFFLINE=1 — internetsiz rejim
         "qdrant": qdrant,
         "collection": collection,
         "indexed_documents": len(documents.chunk_counts()) if collection["exists"] else 0,
@@ -79,7 +81,9 @@ def llms():
     """LLM'lar va ular sozlanganmi (API kalitlarning o'zi hech qachon qaytarilmaydi)."""
     result = []
     for name, provider in LLM_PROVIDERS.items():
-        if provider["key_env"]:
+        if provider["key_env"] and is_offline():
+            ready, detail = False, "Offline rejim — cloud LLM o'chirilgan"
+        elif provider["key_env"]:
             ready = bool(os.getenv(provider["key_env"]))
             detail = "API kalit sozlangan" if ready else f"{provider['key_env']} .env faylida yo'q"
         else:
@@ -183,6 +187,6 @@ def shutdown():
 
 
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorn  # FastAPI ilovasini ishga tushiradigan server (pip install uvicorn)
 
     uvicorn.run(app, host="127.0.0.1", port=int(os.getenv("TACTIQ_API_PORT", "8000")))

@@ -16,6 +16,16 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent  # config/settings.py -> l
 load_dotenv(PROJECT_ROOT / ".env")                     # .env bo'lmasa — hech narsa qilmaydi
 
 
+def is_offline() -> bool:
+    """TACTIQ_OFFLINE=1 — internetsiz rejim: faqat local LLM (qwen), Hugging Face'ga so'rov yo'q."""
+    return os.getenv("TACTIQ_OFFLINE", "").strip() == "1"
+
+
+if is_offline():  # transformers import qilinishidan OLDIN bo'lishi shart — model faqat keshdan olinadi
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
+
 def _read_int(name: str, default: int) -> int:
     """Environment variable'ni int sifatida o'qiydi."""
     value = os.getenv(name)
@@ -67,6 +77,10 @@ def _read_path(name: str, default: Path) -> Path:
 def get_settings() -> Settings:
     """.env / environment variable'lardan Settings yaratadi."""
     defaults = Settings()
+    qdrant_url = os.getenv("QDRANT_URL", defaults.qdrant_url)
+    local_path = _read_optional("QDRANT_LOCAL_PATH")
+    if is_offline() and not local_path and not qdrant_url.startswith(("http://localhost", "http://127.0.0.1")):
+        raise ValueError("Offline rejim: Qdrant Cloud ishlamaydi. QDRANT_LOCAL_PATH yoki Docker (localhost) ishlating.")
     return Settings(
         raw_data_dir=_read_path("TACTIQ_RAW_DATA_DIR", defaults.raw_data_dir),
         processed_data_dir=_read_path("TACTIQ_PROCESSED_DATA_DIR", defaults.processed_data_dir),
@@ -74,8 +88,8 @@ def get_settings() -> Settings:
         chunk_overlap=_read_int("TACTIQ_CHUNK_OVERLAP", defaults.chunk_overlap),
         embedding_model_name=os.getenv("TACTIQ_EMBEDDING_MODEL", defaults.embedding_model_name),
         embedding_batch_size=_read_int("TACTIQ_EMBEDDING_BATCH_SIZE", defaults.embedding_batch_size),
-        qdrant_url=os.getenv("QDRANT_URL", defaults.qdrant_url),
+        qdrant_url=qdrant_url,
         qdrant_api_key=_read_optional("QDRANT_API_KEY"),
         qdrant_collection=os.getenv("QDRANT_COLLECTION", defaults.qdrant_collection),
-        qdrant_local_path=_read_optional("QDRANT_LOCAL_PATH"),
+        qdrant_local_path=local_path,
     )

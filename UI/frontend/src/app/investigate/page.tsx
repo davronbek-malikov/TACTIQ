@@ -1,30 +1,28 @@
 "use client";
 
-import { Bot, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Plus, Save, SlidersHorizontal, X } from "lucide-react";
+import { Bot, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Plus, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { EVIDENCE_CATEGORIES, EvidenceCard } from "@/components/evidence/evidence-card";
-import { AnswerText } from "@/components/investigate/answer-text";
 import { Composer } from "@/components/investigate/composer";
+import { EvidencePanel } from "@/components/investigate/evidence-panel";
 import { KnowledgePanel, type KnowledgeFilters } from "@/components/investigate/knowledge-panel";
-import { ProgressSteps } from "@/components/investigate/progress-steps";
-import { Badge } from "@/components/ui/badge";
+import { TurnView, type Turn } from "@/components/investigate/turn-view";
 import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/format";
 import { saveReport } from "@/lib/reports";
-import type { AnswerMode, InvestigateResponse, LlmId } from "@/lib/types";
+import type { AnswerMode, ComposerMode, LlmId } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
-interface Turn {
-  id: string;
-  question: string;
-  llm: LlmId;
-  mode: AnswerMode;
-  status: "running" | "done" | "error";
-  response?: InvestigateResponse;
-  error?: string;
-  saved?: boolean;
+// Bir xil group'dagi turn'lar (Compare) bitta qatorga yig'iladi
+function groupTurns(turns: Turn[]): Turn[][] {
+  const groups: Turn[][] = [];
+  for (const turn of turns) {
+    const last = groups[groups.length - 1];
+    if (turn.group && last?.[0].group === turn.group) last.push(turn);
+    else groups.push([turn]);
+  }
+  return groups;
 }
 
 export default function InvestigatePage() {
@@ -35,7 +33,7 @@ export default function InvestigatePage() {
 
   const [filters, setFilters] = useState<KnowledgeFilters>({ collection: "", documentIds: [], fileTypes: [], topics: [], languages: [] });
   const [llm, setLlm] = useState<LlmId>("qwen");
-  const [mode, setMode] = useState<AnswerMode>("rag");
+  const [mode, setMode] = useState<ComposerMode>("rag");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [activeTurnId, setActiveTurnId] = useState<string | null>(null);
   const [activeEvidence, setActiveEvidence] = useState<string | null>(null);
@@ -64,9 +62,16 @@ export default function InvestigatePage() {
   const evidence = activeTurn?.response?.evidence ?? [];
   const busy = turns.some((t) => t.status === "running");
 
-  async function ask(question: string, askMode: AnswerMode = mode) {
+  // Compare: bitta savol ikki marta (LLM only va RAG), bir xil group bilan -> yonma-yon ko'rsatiladi
+  function submit(question: string) {
+    if (mode !== "compare") return ask(question, mode);
+    const group = crypto.randomUUID();
+    return Promise.all([ask(question, "llm_only", group), ask(question, "rag", group)]);
+  }
+
+  async function ask(question: string, askMode: AnswerMode, group?: string) {
     const id = crypto.randomUUID();
-    setTurns((prev) => [...prev, { id, question, llm, mode: askMode, status: "running" }]);
+    setTurns((prev) => [...prev, { id, question, llm, mode: askMode, status: "running", group }]);
     try {
       const response = await api.investigate({
         question,
@@ -107,37 +112,7 @@ export default function InvestigatePage() {
   );
 
   const evidencePanel = (
-    <div className="flex h-full flex-col">
-      <div className="border-b border-line px-4 py-3">
-        <h2 className="text-sm font-semibold">Evidence</h2>
-        <p className="text-xs text-muted">{activeTurn ? `For: ${activeTurn.question}` : "Sources behind the answer appear here"}</p>
-      </div>
-      <div className="flex-1 space-y-2 overflow-y-auto p-3">
-        {evidence.length === 0 ? (
-          <p className="px-1 py-6 text-center text-sm text-muted">No evidence yet.</p>
-        ) : (
-          evidence.map((item, index) => (
-            <EvidenceCard
-              key={item.evidence_id}
-              evidence={item}
-              number={index + 1}
-              active={activeEvidence === item.evidence_id}
-              expanded={activeEvidence === item.evidence_id}
-              onSelect={() => setActiveEvidence(item.evidence_id)}
-            />
-          ))
-        )}
-      </div>
-      <details className="border-t border-line px-4 py-3 text-xs text-muted">
-        <summary className="cursor-pointer font-medium">Evidence categories</summary>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {Object.values(EVIDENCE_CATEGORIES).map((c) => (
-            <Badge key={c.label} tone={c.tone}>{c.label}</Badge>
-          ))}
-        </div>
-        <p className="mt-2">Today the engine returns document evidence. Statistics, video timestamps and validation labels arrive with later modules.</p>
-      </details>
-    </div>
+    <EvidencePanel question={activeTurn?.question} evidence={evidence} activeId={activeEvidence} onSelect={setActiveEvidence} />
   );
 
   return (
@@ -175,11 +150,22 @@ export default function InvestigatePage() {
                 description="Ask a question about your indexed documents. TACTIQ retrieves the most relevant passages and answers only from them, with numbered citations."
               />
             ) : (
-              turns.map((turn) => <TurnView key={turn.id} turn={turn} busy={busy} onAskWithRag={() => ask(turn.question, "rag")} onCite={(eid) => cite(turn.id, eid)} onSave={() => {
-                if (!turn.response) return;
-                saveReport(turn.response);
-                setTurns((prev) => prev.map((t) => (t.id === turn.id ? { ...t, saved: true } : t)));
-              }} />)
+              groupTurns(turns).map((group) => {
+                const view = (turn: Turn, compact = false) => (
+                  <TurnView key={turn.id} turn={turn} busy={busy} compact={compact} onAskWithRag={() => ask(turn.question, "rag")} onCite={(eid) => cite(turn.id, eid)} onSave={() => {
+                    if (!turn.response) return;
+                    saveReport(turn.response);
+                    setTurns((prev) => prev.map((t) => (t.id === turn.id ? { ...t, saved: true } : t)));
+                  }} />
+                );
+                if (group.length === 1) return view(group[0]);
+                return (
+                  <div key={group[0].id} className="flex flex-col gap-3">
+                    <div className="self-end rounded-xl bg-primary-soft px-4 py-2.5 text-[15px] text-ink">{group[0].question}</div>
+                    <div className="grid gap-3 lg:grid-cols-2">{group.map((turn) => view(turn, true))}</div>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
@@ -187,7 +173,7 @@ export default function InvestigatePage() {
         <div className="border-t border-line bg-canvas px-4 py-3">
           <div className="mx-auto max-w-3xl">
             {llms.error && <div className="mb-2"><ErrorState message={llms.error} /></div>}
-            <Composer key={prefill} llms={llms.data ?? []} llm={llm} onLlmChange={setLlm} mode={mode} onModeChange={setMode} onSubmit={(q) => ask(q)} busy={busy} initialQuestion={prefill} />
+            <Composer key={prefill} llms={llms.data ?? []} llm={llm} onLlmChange={setLlm} mode={mode} onModeChange={setMode} onSubmit={(q) => void submit(q)} busy={busy} initialQuestion={prefill} />
           </div>
         </div>
       </section>
@@ -207,52 +193,6 @@ export default function InvestigatePage() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function TurnView({ turn, busy, onAskWithRag, onCite, onSave }: { turn: Turn; busy: boolean; onAskWithRag: () => void; onCite: (evidenceId: string) => void; onSave: () => void }) {
-  const response = turn.response;
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="self-end rounded-xl bg-primary-soft px-4 py-2.5 text-[15px] text-ink">{turn.question}</div>
-      <div className="rounded-xl border border-line bg-card p-4">
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <span className="flex items-center gap-2 text-xs font-medium text-muted">
-            <Badge tone={turn.mode === "rag" ? "success" : "warning"}>{turn.mode === "rag" ? "RAG" : "LLM only"}</Badge>
-            {turn.llm}{response ? ` (${response.model})` : ""}
-          </span>
-          {response?.answered && (
-            <Button variant="ghost" size="sm" onClick={onSave} disabled={turn.saved}>
-              <Save className="size-3.5" /> {turn.saved ? "Saved" : "Save to reports"}
-            </Button>
-          )}
-        </div>
-
-        {turn.status === "running" && <ProgressSteps running />}
-        {turn.status === "error" && <ErrorState message={turn.error ?? "Request failed"} />}
-
-        {response && (
-          <div className="flex flex-col gap-3">
-            {response.answer && <AnswerText text={response.answer} onCite={onCite} />}
-            {response.mode === "llm_only" && response.answered && (
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-warning-soft px-3 py-2 text-xs text-warning">
-                <span>Model&apos;s own knowledge — not checked against your documents, no sources. It may be wrong or out of date.</span>
-                <Button variant="secondary" size="sm" onClick={onAskWithRag} disabled={busy}>Ask the same with RAG</Button>
-              </div>
-            )}
-            {!response.answered && !response.error && (
-              <p className="text-sm text-muted">No passage in the selected sources was relevant enough, so the LLM was not called. Nothing was invented.</p>
-            )}
-            {response.error && (
-              <ErrorState message={`Evidence was retrieved, but the LLM could not answer: ${response.error}`} />
-            )}
-            <div className="border-t border-line pt-3">
-              <ProgressSteps steps={response.steps} />
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
