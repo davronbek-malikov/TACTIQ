@@ -43,8 +43,17 @@ const json = (method: string, body: unknown): RequestInit => ({
   body: JSON.stringify(body),
 });
 
+// football_data/statsbomb/... kabi ichki papkalar: har bir qism alohida kodlanadi, "/" qoladi
 const docPath = (source: SourceName, filename: string) =>
-  `/api/documents/${source}/${encodeURIComponent(filename)}`;
+  `/api/documents/${source}/${filename.split("/").map(encodeURIComponent).join("/")}`;
+
+// Asl faylni yangi tabda ochish (PDF uchun sahifaga sakraydi)
+export const rawDocumentUrl = (source: SourceName, filename: string, page?: number | null) =>
+  `${API_URL}${docPath(source, filename)}/raw${page ? `#page=${page}` : ""}`;
+
+// Hujjat sahifasi: barcha chunk'lar, keltirilgan chunk ajratib ko'rsatiladi
+export const sourcePageUrl = (source: SourceName, filename: string, chunk?: number | null) =>
+  `/source?source=${source}&file=${encodeURIComponent(filename)}${chunk != null ? `&chunk=${chunk}` : ""}`;
 
 export const api = {
   system: () => request<SystemInfo>("/api/system"),
@@ -62,7 +71,8 @@ export const api = {
     form.append("file", file);
     form.append("overwrite", String(overwrite));
     Object.entries(metadata).forEach(([key, value]) => form.append(key, value ?? ""));
-    return request<{ source: SourceName; filename: string; document_id: string }>("/api/documents/upload", {
+    // indexing_job — avtomatik boshlangan index; index_queued — boshqa index tugagach boshlanadi
+    return request<{ source: SourceName; filename: string; document_id: string; indexing_job: IndexingJob | null; index_queued: boolean }>("/api/documents/upload", {
       method: "POST",
       body: form,
     });

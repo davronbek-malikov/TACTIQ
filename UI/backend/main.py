@@ -10,7 +10,8 @@ import os                # os.getenv — port, CORS manzillari, API kalitlar bor
 import urllib.request    # Ollama ishlayaptimi — oddiy HTTP so'rov
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile  # web API (pip install fastapi)
-from fastapi.middleware.cors import CORSMiddleware  # brauzer :3000 dan :8000 ga so'rov yubora olsin
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse  # asl faylni brauzerga yuborish  # brauzer :3000 dan :8000 ga so'rov yubora olsin
 
 import core
 import documents
@@ -104,7 +105,18 @@ def list_documents():
     return documents.list_documents()
 
 
-@app.get("/api/documents/{source}/{filename}")
+@app.get("/api/documents/{source}/{filename:path}/raw")
+def raw_document(source: str, filename: str):
+    """Asl faylni brauzerda ochish (PDF, MD, TXT ko'rinadi; DOCX yuklab olinadi)."""
+    try:
+        path = documents.resolve_file(source, filename)
+    except Exception as error:
+        raise http_error(error)
+    media = {".pdf": "application/pdf", ".md": "text/plain; charset=utf-8", ".txt": "text/plain; charset=utf-8"}
+    return FileResponse(path, media_type=media.get(path.suffix.lower()), content_disposition_type="inline")
+
+
+@app.get("/api/documents/{source}/{filename:path}")
 def document_detail(source: str, filename: str):
     try:
         return documents.document_detail(source, filename)
@@ -123,20 +135,24 @@ async def upload_document(
     metadata = {"document_type": document_type, "topic": topic, "language": language,
                 "match_id": match_id, "team_id": team_id, "player_id": player_id}
     try:
-        return documents.save_upload(file.filename, content, metadata, overwrite)
+        saved = documents.save_upload(file.filename, content, metadata, overwrite)
     except Exception as error:
         raise http_error(error)
+    job = indexing_jobs.request_index("my_documents")  # foydalanuvchi "Index" bosishi shart emas
+    return {**saved, "indexing_job": job, "index_queued": job is None}
 
 
-@app.put("/api/documents/{source}/{filename}/metadata")
+@app.put("/api/documents/{source}/{filename:path}/metadata")
 def update_metadata(source: str, filename: str, body: MetadataUpdate):
     try:
-        return documents.update_metadata(source, filename, body.model_dump())
+        result = documents.update_metadata(source, filename, body.model_dump())
     except Exception as error:
         raise http_error(error)
+    indexing_jobs.request_index(source)  # yangi metadata Qdrant payload'iga ham tushsin
+    return result
 
 
-@app.delete("/api/documents/{source}/{filename}")
+@app.delete("/api/documents/{source}/{filename:path}")
 def delete_document(source: str, filename: str):
     try:
         documents.delete_document(source, filename)

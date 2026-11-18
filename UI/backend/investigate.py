@@ -18,7 +18,29 @@ from llm_generation import generate_answer, get_model_name  # 06
 from rag_pipeline import NO_ANSWER                          # 07 (mos chunk yo'q bo'lganda)
 
 import core
+import documents
 from schemas import Evidence, InvestigateRequest, InvestigateResponse, Step
+
+PROVIDER_URLS = {  # document_type prefiksi -> asl data manbasi
+    "statsbomb": "https://github.com/statsbomb/open-data",
+    "wyscout": "https://figshare.com/collections/Soccer_match_event_dataset/4415000",
+    "skillcorner": "https://github.com/SkillCorner/opendata",
+}
+
+
+def make_evidence(number: int, chunk, payload: dict) -> Evidence:
+    """Chunk -> Evidence: matn + hujjatga havola (manba, fayl, sahifa, chunk raqami)."""
+    location = documents.locate(payload.get("document_id") or "")
+    doc_type = payload.get("document_type") or ""
+    return Evidence(
+        evidence_id=str(number), title=f"{chunk.source}" + (f" · page {chunk.page}" if chunk.page else ""),
+        text=chunk.text, score=round(chunk.score, 4), source=chunk.source, page=chunk.page,
+        document_id=payload.get("document_id"), chunk_index=payload.get("chunk_index"),
+        source_name=location[0] if location else None, filename=location[1] if location else None,
+        provider_url=PROVIDER_URLS.get(doc_type.split("_")[0]),
+        metadata={k: payload.get(k) for k in ("file_type", "topic", "language", "document_type")},
+    )
+
 
 STEP_NAMES = {
     "01": "User Question", "02": "Query Embedding", "03": "Similarity Search", "04": "Top-k Retrieval",
@@ -88,13 +110,7 @@ def run(request: InvestigateRequest) -> InvestigateResponse:
                        lambda p: f"{len(p)} ta chunk solishtirildi")
     chunks = timed("04", lambda: select_top_k(points, k=request.k), lambda c: f"{len(c)} ta mos chunk")
 
-    evidence = [
-        Evidence(evidence_id=str(n), title=f"{c.source}" + (f" · page {c.page}" if c.page else ""), text=c.text,
-                 score=round(c.score, 4), source=c.source, page=c.page,
-                 document_id=p.payload.get("document_id"), chunk_index=p.payload.get("chunk_index"),
-                 metadata={k: p.payload.get(k) for k in ("file_type", "topic", "language", "document_type")})
-        for n, (c, p) in enumerate(zip(chunks, points), start=1)
-    ]
+    evidence = [make_evidence(n, c, p.payload) for n, (c, p) in enumerate(zip(chunks, points), start=1)]
 
     if not chunks:  # mos dalil yo'q — LLM chaqirilmaydi, javob o'ylab topilmaydi
         for step_id in ("05", "06"):

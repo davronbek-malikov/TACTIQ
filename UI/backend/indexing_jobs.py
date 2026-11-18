@@ -19,6 +19,7 @@ from documents import source_dir
 HISTORY_FILE = core.RUNTIME_DIR / "indexing_history.json"
 _jobs: dict[str, dict] = {}
 _running = threading.Lock()
+_pending: set[str] = set()  # job ishlayotganda kelgan so'rovlar — tugagach avtomatik qayta ishga tushadi
 
 
 def _now() -> str:
@@ -65,6 +66,17 @@ def _run(job: dict, folder) -> None:
         job["finished_at"] = _now()
         _save_history(job)
         _running.release()
+        if _pending:                                   # navbatda turgan manba bo'lsa — darhol index qilamiz
+            request_index(_pending.pop())
+
+
+def request_index(source: str) -> dict | None:
+    """Avtomatik index (upload / metadata o'zgarganda). Band bo'lsa — navbatga qo'yadi va None qaytaradi."""
+    try:
+        return start_job(source)
+    except RuntimeError:
+        _pending.add(source)
+        return None
 
 
 def get_job(job_id: str) -> dict:

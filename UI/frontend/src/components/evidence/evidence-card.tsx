@@ -1,5 +1,7 @@
-import { BarChart3, FileText, Image as ImageIcon, Mic, PlayCircle } from "lucide-react";
+import { BarChart3, Database, ExternalLink, FileSearch, FileText, Image as ImageIcon, Mic, PlayCircle } from "lucide-react";
+import type { ReactNode } from "react";
 import { Badge, type Tone } from "@/components/ui/badge";
+import { rawDocumentUrl, sourcePageUrl } from "@/lib/api";
 import { cn, formatTimestamp } from "@/lib/format";
 import type { Evidence, EvidenceCategory, EvidenceKind } from "@/lib/types";
 
@@ -25,6 +27,21 @@ export function EvidenceCategoryBadge({ category }: { category: EvidenceCategory
   const { label, tone } = EVIDENCE_CATEGORIES[category];
   return <Badge tone={tone}>{label}</Badge>;
 }
+
+// Matndagi http(s) manzillarni bosiladigan havolaga aylantiradi
+function linkify(text: string): ReactNode[] {
+  return text.split(/(https?:\/\/[^\s)]+)/g).map((part, i) =>
+    /^https?:\/\//.test(part) ? (
+      <a key={i} href={part} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="break-all text-primary underline underline-offset-2">
+        {part}
+      </a>
+    ) : (
+      part
+    ),
+  );
+}
+
+const linkClass = "inline-flex items-center gap-1 rounded-md border border-line px-2 py-1 text-xs font-medium text-ink hover:border-primary/40 hover:text-primary";
 
 // Bitta dalil: hujjat (sahifa), statistika, video (vaqt belgisi), rasm yoki audio
 export function EvidenceCard({
@@ -72,8 +89,24 @@ export function EvidenceCard({
         </div>
       </header>
       <p className={cn("mt-2 whitespace-pre-line text-sm leading-relaxed text-ink/90", !expanded && "line-clamp-4")}>
-        {evidence.text}
+        {linkify(evidence.text)}
       </p>
+      {evidence.source_name && evidence.filename && (
+        <div className="mt-2 flex flex-wrap gap-1.5" onClick={(e) => e.stopPropagation()}>
+          {/* yangi tab: Investigate'dagi suhbat yo'qolmasin */}
+          <a href={sourcePageUrl(evidence.source_name, evidence.filename, evidence.chunk_index)} target="_blank" rel="noreferrer" className={linkClass} title="Open the full document with this passage highlighted">
+            <FileSearch className="size-3.5" /> View in document
+          </a>
+          <a href={rawDocumentUrl(evidence.source_name, evidence.filename, evidence.page)} target="_blank" rel="noreferrer" className={linkClass} title="Open the original file in a new tab">
+            <ExternalLink className="size-3.5" /> Open file
+          </a>
+          {evidence.provider_url && (
+            <a href={evidence.provider_url} target="_blank" rel="noreferrer" className={linkClass} title="Original data provider">
+              <Database className="size-3.5" /> Data source
+            </a>
+          )}
+        </div>
+      )}
       {expanded && Object.values(evidence.metadata).some(Boolean) && (
         <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 border-t border-line pt-2 text-xs">
           {Object.entries(evidence.metadata).map(([key, value]) =>

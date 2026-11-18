@@ -24,7 +24,7 @@ export function DocumentDetailPanel({ row, onClose, onChanged }: { row: Document
     try {
       await api.updateMetadata(row.source, row.filename, form);
       setEditing(false);
-      setMessage("Metadata saved. Re-index “My documents” to apply it to Qdrant.");
+      setMessage("Metadata saved. Qdrant is updated automatically in a few seconds.");
       onChanged();
       detail.reload();
     } catch (err) {

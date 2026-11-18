@@ -121,6 +121,9 @@ export interface Evidence {
   source?: string | null;
   page?: number | null;
   chunk_index?: number | null;
+  source_name?: SourceName | null; // havola: /source?source=...&file=...
+  filename?: string | null;
+  provider_url?: string | null; // asl data manbasi (StatsBomb, Wyscout, SkillCorner)
   // video (V2): match + timestamp + clip/frame
   video?: { match_label: string; timestamp_seconds: number; clip_id?: string; frame?: number };
   metadata: Record<string, string | number | null>;

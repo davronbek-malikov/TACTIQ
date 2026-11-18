@@ -71,6 +71,9 @@ npm run dev                        # http://localhost:3000
 
 Brauzerda **http://localhost:3000** ni oching → **Knowledge** → *Sample documents → Index* → **Investigate**.
 
+**Yangi hujjat qo'shish (texnik bilim shart emas):** Knowledge → *Add documents* → fayl(lar)ni tanlang → **Upload and index**.
+Index o'zi boshlanadi (bir necha soniya - bir daqiqa), tugagach *Ask a question* tugmasi chiqadi. Metadata o'zgartirilsa ham qayta index avtomatik.
+
 **LLM** (kamida bittasi, `.env` da): `GROQ_API_KEY`, `GEMINI_API_KEY` yoki Ollama (`ollama pull qwen2.5:1.5b`).
 LLM sozlanmagan bo'lsa ham dalillar (evidence) topiladi, faqat javob o'rniga aniq xato ko'rsatiladi.
 

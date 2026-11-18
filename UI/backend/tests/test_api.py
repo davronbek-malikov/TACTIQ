@@ -50,6 +50,16 @@ def wait_for_job(client, job_id):
     raise TimeoutError(job_id)
 
 
+def wait_idle():
+    """Avtomatik index (upload / metadata) tugashini kutadi."""
+    import indexing_jobs
+    for _ in range(300):
+        if not indexing_jobs._running.locked() and not indexing_jobs._pending:
+            return
+        time.sleep(0.2)
+    raise TimeoutError("auto-index")
+
+
 def test_health_and_system_before_indexing(client):
     assert client.get("/api/health").json()["status"] == "ok"
     system = client.get("/api/system").json()
@@ -85,11 +95,13 @@ def test_upload_index_and_details(client):
         data={"topic": "rest_defence", "language": "en"},
     )
     assert uploaded.status_code == 200, uploaded.text
+    auto_job = uploaded.json()["indexing_job"]  # upload'dan keyin index o'zi boshlanadi
+    assert auto_job["source"] == "my_documents"
+    assert wait_for_job(client, auto_job["id"])["status"] == "succeeded"
     assert client.post("/api/documents/upload", files={"file": ("rest_defence.txt", b"again")}).status_code == 409
 
-    for source in ("sample_docs", "my_documents"):
-        job = client.post("/api/indexing/jobs", json={"source": source}).json()
-        assert wait_for_job(client, job["id"])["status"] == "succeeded"
+    job = client.post("/api/indexing/jobs", json={"source": "sample_docs"}).json()
+    assert wait_for_job(client, job["id"])["status"] == "succeeded"
 
     rows = {row["filename"]: row for row in client.get("/api/documents").json()}
     assert rows["counterpressing.pdf"]["chunks"] == 2
@@ -112,6 +124,7 @@ def test_metadata_editing_rules(client):
     assert ok.status_code == 200 and ok.json()["topic"] == "rest_defence_v2" and ok.json()["team_id"] is None
     forbidden = client.put("/api/documents/sample_docs/low_block.txt/metadata", json={"topic": "x"})
     assert forbidden.status_code == 403
+    wait_idle()  # metadata o'zgargach qayta index avtomatik ishladi
 
 
 def test_investigate_answer_no_answer_and_llm_error(client, monkeypatch):

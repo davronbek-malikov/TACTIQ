@@ -49,9 +49,24 @@ def resolve_file(source: str, filename: str) -> Path:
     """Fayl yo'lini xavfsiz topadi: faqat manba papkasi ichidagi qo'llab-quvvatlanadigan fayl."""
     folder = source_dir(source).resolve()
     path = (folder / filename).resolve()
-    if path.parent != folder or path.suffix.lower() not in SUPPORTED_EXTENSIONS or not path.is_file():
+    inside = folder in path.parents  # ichki papkalar ham mumkin (football_data/statsbomb/...), "../" esa yo'q
+    if not inside or path.suffix.lower() not in SUPPORTED_EXTENSIONS or not path.is_file():
         raise FileNotFoundError(f"Hujjat topilmadi: {source}/{filename}")
     return path
+
+
+_locations: dict[str, tuple[str, str]] = {}
+
+
+def locate(document_id: str) -> tuple[str, str] | None:
+    """document_id -> (manba, nisbiy yo'l). Evidence'dan hujjatga havola yasash uchun (kesh bilan)."""
+    if document_id not in _locations:
+        for source, folder in SOURCES.items():
+            if folder.is_dir():
+                for path in discover_files(folder):
+                    relative = path.relative_to(folder).as_posix()
+                    _locations[make_document_id(relative)] = (source, relative)
+    return _locations.get(document_id)
 
 
 def chunk_counts(collection: str = None) -> Counter:
@@ -176,7 +191,7 @@ def write_sidecar(path: Path, metadata: dict) -> None:
 
 
 def update_metadata(source: str, filename: str, metadata: dict) -> dict:
-    """Sidecar'ni yangilaydi. Qdrant'ga ta'sir qilishi uchun keyin qayta index qilish kerak."""
+    """Sidecar'ni yangilaydi (main.py keyin avtomatik qayta index qiladi)."""
     if source not in EDITABLE_SOURCES:
         raise PermissionError("Namunaviy hujjatlar metadata'si o'zgartirilmaydi.")
     path = resolve_file(source, filename)

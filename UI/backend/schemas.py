@@ -54,6 +54,9 @@ class Evidence(BaseModel):
     source: Optional[str] = None
     page: Optional[int] = None
     chunk_index: Optional[int] = None
+    source_name: Optional[str] = None   # sample_docs / my_documents / football_data — havola uchun
+    filename: Optional[str] = None      # manba papkasiga nisbatan yo'l
+    provider_url: Optional[str] = None  # asl data manbasi (StatsBomb, Wyscout, SkillCorner)
     metadata: dict = {}
 
 
