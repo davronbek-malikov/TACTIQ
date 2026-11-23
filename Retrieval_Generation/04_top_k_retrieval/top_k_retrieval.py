@@ -1,14 +1,3 @@
-"""
-04 — Top-k Retrieval: eng mos k ta chunk'ni tanlaydi.
-
-min_score'dan past chunk'lar tashlanadi — ular savolga aloqador emas.
-Hech biri qolmasa, LLM chaqirilmaydi (javobni o'ylab topmaslik uchun).
-
-    python Retrieval_Generation/04_top_k_retrieval/top_k_retrieval.py
-
-Keyingi bosqich: 05 — Prompt Construction
-"""
-
 from dataclasses import dataclass
 from typing import Optional
 

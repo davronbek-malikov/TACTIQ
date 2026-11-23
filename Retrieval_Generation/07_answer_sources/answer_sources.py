@@ -1,10 +1,3 @@
-"""
-07 — Answer + Sources: javob va manbalarni foydalanuvchiga qaytaradi.
-
-Manba ko'rsatish — RAG'ning asosiy afzalligi: javobni tekshirish mumkin.
-
-    python Retrieval_Generation/07_answer_sources/answer_sources.py
-"""
 
 from dataclasses import dataclass, field
 

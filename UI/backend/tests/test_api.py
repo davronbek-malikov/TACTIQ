@@ -128,7 +128,7 @@ def test_metadata_editing_rules(client):
 
 
 def test_investigate_answer_no_answer_and_llm_error(client, monkeypatch):
-    monkeypatch.setattr(investigate, "generate_answer", lambda messages, llm: "Pressing right after losing the ball [1].")
+    monkeypatch.setattr(investigate, "generate_answer_with_fallback", lambda messages, llm: ("Pressing right after losing the ball [1].", llm))
     result = client.post("/api/investigate", json={"question": "What is counterpressing?", "llm": "groq"}).json()
     assert result["answered"] is True
     assert result["evidence"][0]["source"] == "counterpressing.pdf"
@@ -147,7 +147,7 @@ def test_investigate_answer_no_answer_and_llm_error(client, monkeypatch):
     def broken_llm(messages, llm):
         raise ValueError("GROQ_API_KEY topilmadi")
 
-    monkeypatch.setattr(investigate, "generate_answer", broken_llm)
+    monkeypatch.setattr(investigate, "generate_answer_with_fallback", broken_llm)
     failed = client.post("/api/investigate", json={"question": "What is a low block?", "llm": "groq"}).json()
     assert failed["answered"] is False and failed["answer"] is None
     assert "GROQ_API_KEY" in failed["error"] and failed["evidence"]
@@ -159,9 +159,9 @@ def test_llm_only_mode_uses_no_documents(client, monkeypatch):
 
     def fake_llm(messages, llm):
         sent["messages"] = messages
-        return "Model's own answer."
+        return "Model's own answer.", llm
 
-    monkeypatch.setattr(investigate, "generate_answer", fake_llm)
+    monkeypatch.setattr(investigate, "generate_answer_with_fallback", fake_llm)
     result = client.post("/api/investigate", json={"question": "What is counterpressing?", "llm": "gemini",
                                                    "mode": "llm_only"}).json()
     assert result["mode"] == "llm_only" and result["answered"] is True
@@ -169,6 +169,14 @@ def test_llm_only_mode_uses_no_documents(client, monkeypatch):
     assert [s["status"] for s in result["steps"]] == ["done", "skipped", "skipped", "skipped", "skipped", "done", "done"]
     assert "Context" not in sent["messages"][1]["content"]           # hujjat konteksti yuborilmagan
     assert sent["messages"][1]["content"] == "What is counterpressing?"
+
+
+def test_fallback_llm_is_shown(client, monkeypatch):
+    """gemini limiti tugasa groq javob beradi — UI'ga haqiqatda javob bergan LLM qaytadi."""
+    monkeypatch.setattr(investigate, "generate_answer_with_fallback", lambda messages, llm: ("Answer [1].", "groq"))
+    result = client.post("/api/investigate", json={"question": "What is counterpressing?", "llm": "gemini"}).json()
+    assert result["answered"] is True and result["llm"] == "groq"
+    assert "zaxira: groq" in result["steps"][5]["detail"]
 
 
 def test_delete_document(client):

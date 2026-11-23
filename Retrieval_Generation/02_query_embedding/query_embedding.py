@@ -1,13 +1,3 @@
-"""
-02 — Query Embedding: savolni vector'ga (384 ta son) aylantiradi.
-
-MUHIM: Indexing'dagi AYNAN o'sha model ishlatiladi — aks holda savol va hujjat vector'larini solishtirib bo'lmaydi.
-
-    python Retrieval_Generation/02_query_embedding/query_embedding.py
-
-Keyingi bosqich: 03 — Similarity Search
-"""
-
 import sys
 from pathlib import Path
 

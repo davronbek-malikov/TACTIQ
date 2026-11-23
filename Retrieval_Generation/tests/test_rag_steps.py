@@ -99,6 +99,38 @@ def test_offline_mode_allows_local_qwen(monkeypatch):
     assert llm_generation.generate_answer([{"role": "user", "content": "hi"}], "qwen") == "local"
 
 
+def test_gemini_limit_falls_back_to_groq(monkeypatch):
+    """Gemini 429 (limit tugadi) -> groq javob beradi."""
+    from openai import RateLimitError
+
+    def fake_generate(messages, llm):
+        if llm == "gemini":
+            raise RateLimitError("quota exceeded", response=SimpleNamespace(request=None, status_code=429, headers={}), body=None)
+        return f"answer from {llm}"
+
+    monkeypatch.setenv("TACTIQ_OFFLINE", "0")
+    monkeypatch.setattr(llm_generation, "generate_answer", fake_generate)
+    assert llm_generation.generate_answer_with_fallback([], "gemini") == ("answer from groq", "groq")
+    assert llm_generation.generate_answer_with_fallback([], "groq") == ("answer from groq", "groq")
+
+
+def test_no_fallback_for_local_qwen_or_offline(monkeypatch):
+    def broken(messages, llm):
+        raise ValueError(f"{llm} broken")
+
+    monkeypatch.setattr(llm_generation, "generate_answer", broken)
+    monkeypatch.setenv("TACTIQ_OFFLINE", "0")
+    with pytest.raises(ValueError, match="qwen broken"):       # qwen -> cloud'ga o'tmaydi (ma'lumot chiqmasin)
+        llm_generation.generate_answer_with_fallback([], "qwen")
+    monkeypatch.setenv("TACTIQ_OFFLINE", "1")
+    with pytest.raises(ValueError, match="gemini broken"):     # offline -> zaxira cloud ham yo'q
+        llm_generation.generate_answer_with_fallback([], "gemini")
+
+
+def test_groq_citations_are_normalized():
+    assert llm_generation.normalize_citations('84 passes' + chr(0x3010) + '1' + chr(0x2020) + 'L13-L15' + chr(0x3011) + '.') == '84 passes[1].'
+
+
 def test_offline_mode_rejects_qdrant_cloud(monkeypatch):
     from config.settings import get_settings
 
@@ -137,9 +169,9 @@ def test_rag_pipeline_end_to_end(indexed_settings, monkeypatch):
 
     def fake_llm(messages, llm):
         sent["messages"], sent["llm"] = messages, llm
-        return "Counterpressing means pressing right after losing the ball [1]."
+        return "Counterpressing means pressing right after losing the ball [1].", llm
 
-    monkeypatch.setattr(rag_pipeline, "generate_answer", fake_llm)
+    monkeypatch.setattr(rag_pipeline, "generate_answer_with_fallback", fake_llm)
     pipeline = rag_pipeline.RagPipeline(indexed_settings)
     try:
         result = pipeline.ask("What is counterpressing?", llm="groq")

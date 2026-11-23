@@ -1,11 +1,3 @@
-"""
-01 — User Question: foydalanuvchi savoli — pipeline'ning kirishi.
-
-    python Retrieval_Generation/01_user_question/user_question.py
-
-Keyingi bosqich: 02 — Query Embedding
-"""
-
 SAMPLE_QUESTIONS = [
     "What is counterpressing?",
     "What are the weaknesses of a low block?",

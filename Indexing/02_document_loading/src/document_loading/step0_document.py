@@ -6,9 +6,6 @@ Keyingi bosqichlar fayl formatini bilmaydi — faqat Document bilan ishlaydi.
 """
 
 from dataclasses import dataclass, field
-
-
-# @dataclass — __init__ ni Python o'zi yozadi: Document(text="...", metadata={...})
 @dataclass
 class Document:
     """Fayldan o'qilgan bitta matn bo'lagi (PDF'da — bitta sahifa, boshqalarda — butun fayl)."""

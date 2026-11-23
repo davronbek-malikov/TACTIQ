@@ -1,21 +1,11 @@
-"""
-06 — LLM Generation: LLM kontekst asosida javob yozadi.
-
-3 ta LLM — bitta `openai` kutubxonasi orqali (hammasi OpenAI-compatible API, faqat manzil farq qiladi):
-    qwen   — o'z kompyuterimizda (Ollama): internetsiz, ma'lumot tashqariga chiqmaydi
-    groq   — cloud, juda tez (GROQ_API_KEY kerak)
-    gemini — cloud, free tier (GEMINI_API_KEY kerak)
-
-    python Retrieval_Generation/06_llm_generation/llm_generation.py --llm groq
-
-Keyingi bosqich: 07 — Answer + Sources
-"""
 
 import os
+import re
 import sys
 from pathlib import Path
 
 from openai import OpenAI  # bitta client — Qwen (Ollama), Groq, Gemini (pip install openai)
+from openai import APIError  # barcha API xatolari: 429 limit, 400/401 kalit, tarmoq, 5xx server
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # Retrieval_Generation/
 import rag_paths  # noqa: E402,F401
@@ -67,7 +57,30 @@ def generate_answer(messages: list[dict], llm: str = "qwen") -> str:
         messages=messages,
         temperature=0,  # 0 — har safar bir xil, eng ishonchli javob
     )
-    return response.choices[0].message.content
+    return normalize_citations(response.choices[0].message.content)
+
+
+def normalize_citations(text: str) -> str:
+    """Groq modeli manbani 【1†L13-L15】 deb yozadi -> bizning formatimiz [1] (UI'da bosiladigan)."""
+    return re.sub(r"【(\d+)†[^】]*】", r"[\1]", text or "")
+
+
+# Zaxira: bir cloud LLM ishlamasa (limit tugadi, kalit yo'q/eskirgan, server javob bermadi) — ikkinchisi.
+# qwen'ga zaxira yo'q: u ataylab local (ma'lumot internetga chiqmasligi kerak).
+FALLBACK = {"gemini": "groq", "groq": "gemini"}
+FALLBACK_ERRORS = (APIError, ValueError)  # ValueError — .env'da kalit yo'q
+
+
+def generate_answer_with_fallback(messages: list[dict], llm: str = "qwen") -> tuple[str, str]:
+    """(javob, qaysi LLM javob berdi). Asosiy LLM xato bersa — zaxira LLM bilan qayta urinadi."""
+    try:
+        return generate_answer(messages, llm), llm
+    except FALLBACK_ERRORS as error:
+        backup = FALLBACK.get(llm)
+        if not backup or is_offline():
+            raise
+        print(f"[06] {llm} ishlamadi ({type(error).__name__}) -> {backup} bilan qayta urinilmoqda")
+        return generate_answer(messages, backup), backup
 
 
 if __name__ == "__main__":
@@ -77,7 +90,9 @@ if __name__ == "__main__":
     parser.add_argument("--llm", choices=list(LLM_PROVIDERS), default="qwen")
     args = parser.parse_args()
 
+    sys.stdout.reconfigure(encoding="utf-8")  # Windows konsoli "‑" kabi belgilarda yiqilmasin
     test_messages = [{"role": "user", "content": "In one sentence: what is counterpressing in football?"}]
     print(f"Rejim: {'OFFLINE (internetsiz)' if is_offline() else 'ONLINE'}")
-    print(f"LLM: {args.llm} ({get_model_name(args.llm)})")
-    print(generate_answer(test_messages, args.llm))
+    answer, used = generate_answer_with_fallback(test_messages, args.llm)
+    print(f"LLM: {used} ({get_model_name(used)})")
+    print(answer)

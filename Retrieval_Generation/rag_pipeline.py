@@ -21,7 +21,7 @@ from query_embedding import embed_question                      # 02
 from similarity_search import similarity_search                 # 03
 from top_k_retrieval import select_top_k                        # 04
 from prompt_construction import build_messages                  # 05
-from llm_generation import LLM_PROVIDERS, generate_answer       # 06
+from llm_generation import LLM_PROVIDERS, generate_answer_with_fallback  # 06
 from answer_sources import RagAnswer, print_answer              # 07
 
 NO_ANSWER = "Hujjatlarda bu savolga javob topilmadi."
@@ -47,8 +47,8 @@ class RagPipeline:
             return RagAnswer(question=question, answer=NO_ANSWER, llm=llm)
 
         messages = build_messages(question, chunks)                                          # 05
-        answer = generate_answer(messages, llm)                                              # 06
-        return RagAnswer(question=question, answer=answer, llm=llm, sources=chunks)          # 07
+        answer, used = generate_answer_with_fallback(messages, llm)                          # 06 (+ zaxira LLM)
+        return RagAnswer(question=question, answer=answer, llm=used, sources=chunks)         # 07
 
     def close(self) -> None:
         self.client.close()
@@ -60,6 +60,7 @@ def main() -> int:
     parser.add_argument("--llm", choices=list(LLM_PROVIDERS), default="qwen")
     parser.add_argument("--k", type=int, default=3)
     args = parser.parse_args()
+    sys.stdout.reconfigure(encoding="utf-8")  # Windows konsoli maxsus belgilarda yiqilmasin
 
     pipeline = RagPipeline()
     try:

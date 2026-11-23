@@ -1,12 +1,3 @@
-"""
-05 — Prompt Construction: savol + topilgan chunk'larni LLM uchun bitta xabarga birlashtiradi.
-
-System prompt LLM'ga qoida beradi: FAQAT kontekst asosida javob ber, bo'lmasa "bilmayman" de, manbani [1] kabi ko'rsat.
-
-    python Retrieval_Generation/05_prompt_construction/prompt_construction.py
-
-Keyingi bosqich: 06 — LLM Generation
-"""
 
 SYSTEM_PROMPT = (
     "You are TACTIQ, a football analysis assistant. "

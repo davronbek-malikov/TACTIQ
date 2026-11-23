@@ -14,7 +14,7 @@ from query_embedding import embed_question                  # 02
 from similarity_search import similarity_search             # 03
 from top_k_retrieval import select_top_k                    # 04
 from prompt_construction import build_messages              # 05
-from llm_generation import generate_answer, get_model_name  # 06
+from llm_generation import generate_answer_with_fallback, get_model_name  # 06 (+ zaxira LLM)
 from rag_pipeline import NO_ANSWER                          # 07 (mos chunk yo'q bo'lganda)
 
 import core
@@ -52,6 +52,12 @@ STEP_NAMES = {
 LLM_ONLY_SYSTEM_PROMPT = "You are a football analysis assistant. Answer the question. Answer in the same language as the question."
 
 
+def llm_detail(asked: str, used: str) -> str:
+    """06-bosqich izohi: zaxira LLM ishlagan bo'lsa — buni halol ko'rsatamiz."""
+    model = get_model_name(used)
+    return model if asked == used else f"{asked} ishlamadi -> zaxira: {used} ({model})"
+
+
 def run_llm_only(request: InvestigateRequest) -> InvestigateResponse:
     """RAG'siz: savol to'g'ridan-to'g'ri LLM'ga. 02–05 bosqichlar ishlamaydi, manba bo'lmaydi."""
     model_name = get_model_name(request.llm)
@@ -64,15 +70,16 @@ def run_llm_only(request: InvestigateRequest) -> InvestigateResponse:
     messages = [{"role": "system", "content": LLM_ONLY_SYSTEM_PROMPT}, {"role": "user", "content": question}]
     start = time.perf_counter()
     try:
-        answer = generate_answer(messages, request.llm)
+        answer, used = generate_answer_with_fallback(messages, request.llm)
     except Exception as error:
         steps.append(Step(id="06", name=STEP_NAMES["06"], status="failed", detail=type(error).__name__))
         return InvestigateResponse(question=question, answer=None, answered=False, llm=request.llm, model=model_name,
                                    mode="llm_only", evidence=[], steps=steps, error=f"{type(error).__name__}: {error}")
+    model_name = get_model_name(used)
     steps.append(Step(id="06", name=STEP_NAMES["06"], status="done",
-                      duration_ms=round((time.perf_counter() - start) * 1000, 1), detail=model_name))
+                      duration_ms=round((time.perf_counter() - start) * 1000, 1), detail=llm_detail(request.llm, used)))
     steps.append(Step(id="07", name=STEP_NAMES["07"], status="done", detail="manba yo'q — modelning o'z bilimi"))
-    return InvestigateResponse(question=question, answer=answer, answered=True, llm=request.llm, model=model_name,
+    return InvestigateResponse(question=question, answer=answer, answered=True, llm=used, model=model_name,
                                mode="llm_only", evidence=[], steps=steps)
 
 
@@ -121,7 +128,8 @@ def run(request: InvestigateRequest) -> InvestigateResponse:
 
     messages = timed("05", lambda: build_messages(question, chunks), lambda m: f"{len(m)} ta xabar")
     try:
-        answer = timed("06", lambda: generate_answer(messages, request.llm), lambda a: model_name)
+        answer, used = timed("06", lambda: generate_answer_with_fallback(messages, request.llm),
+                             lambda result: llm_detail(request.llm, result[1]))
     except Exception as error:  # LLM sozlanmagan yoki ishlamayapti — halol xato
         steps.append(Step(id="06", name=STEP_NAMES["06"], status="failed", detail=type(error).__name__))
         return InvestigateResponse(question=question, answer=None, answered=False, llm=request.llm,
@@ -129,5 +137,5 @@ def run(request: InvestigateRequest) -> InvestigateResponse:
                                    error=f"{type(error).__name__}: {error}")
 
     steps.append(Step(id="07", name=STEP_NAMES["07"], status="done", detail=f"{len(evidence)} ta manba"))
-    return InvestigateResponse(question=question, answer=answer, answered=True, llm=request.llm,
-                               model=model_name, evidence=evidence, steps=steps)
+    return InvestigateResponse(question=question, answer=answer, answered=True, llm=used,
+                               model=get_model_name(used), evidence=evidence, steps=steps)

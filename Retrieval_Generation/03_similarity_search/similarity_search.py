@@ -1,12 +1,3 @@
-"""
-03 — Similarity Search: savol vector'ini Qdrant'dagi chunk vector'lari bilan solishtiradi (cosine).
-
-score 1 ga qancha yaqin — chunk savolga shuncha o'xshash. Natija kattadan kichikka tartiblangan.
-
-    python Retrieval_Generation/03_similarity_search/similarity_search.py
-
-Keyingi bosqich: 04 — Top-k Retrieval
-"""
 
 import sys
 from pathlib import Path

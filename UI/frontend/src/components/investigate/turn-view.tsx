@@ -36,7 +36,9 @@ export function TurnView({ turn, busy, compact = false, onAskWithRag, onCite, on
         <div className="mb-3 flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 text-xs font-medium text-muted">
             <Badge tone={turn.mode === "rag" ? "success" : "warning"}>{turn.mode === "rag" ? "RAG" : "LLM only"}</Badge>
-            {turn.llm}{response ? ` (${response.model})` : ""}
+            {/* zaxira LLM javob bergan bo'lsa (gemini -> groq) — haqiqatda javob bergan LLM ko'rsatiladi */}
+            {response?.llm ?? turn.llm}{response ? ` (${response.model})` : ""}
+            {response && response.llm !== turn.llm && <Badge tone="warning">fallback from {turn.llm}</Badge>}
           </span>
           {response?.answered && (
             <Button variant="ghost" size="sm" onClick={onSave} disabled={turn.saved}>
